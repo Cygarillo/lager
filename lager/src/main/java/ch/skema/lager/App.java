@@ -7,8 +7,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-import ch.skema.lager.domain.Customer;
-import ch.skema.lager.repository.CustomerRepository;
+import ch.skema.lager.domain.Kunde;
+import ch.skema.lager.repository.KundeRepository;
 
 @SpringBootApplication
 public class App {
@@ -20,25 +20,25 @@ public class App {
 	}
 
 	@Bean
-	public CommandLineRunner loadData(CustomerRepository repository) {
+	public CommandLineRunner loadData(KundeRepository repository) {
 		return (args) -> {
 			// save a couple of customers
-			repository.save(new Customer("Jack", "Bauer"));
-			repository.save(new Customer("Chloe", "O'Brian"));
-			repository.save(new Customer("Kim", "Bauer"));
-			repository.save(new Customer("David", "Palmer"));
-			repository.save(new Customer("Michelle", "Dessler"));
+			repository.save(new Kunde("Jack Bauer"));
+			repository.save(new Kunde("Chloe O'Brian"));
+			repository.save(new Kunde("Kim Bauer"));
+			repository.save(new Kunde("David Palmer"));
+			repository.save(new Kunde("Michelle Dessler"));
 
 			// fetch all customers
 			log.info("Customers found with findAll():");
 			log.info("-------------------------------");
-			for (Customer customer : repository.findAll()) {
+			for (Kunde customer : repository.findAll()) {
 				log.info(customer.toString());
 			}
 			log.info("");
 
 			// fetch an individual customer by ID
-			Customer customer = repository.findOne(1L);
+			Kunde customer = repository.findOne(1L);
 			log.info("Customer found with findOne(1L):");
 			log.info("--------------------------------");
 			log.info(customer.toString());
@@ -47,7 +47,7 @@ public class App {
 			// fetch customers by last name
 			log.info("Customer found with findByLastNameStartsWithIgnoreCase('Bauer'):");
 			log.info("--------------------------------------------");
-			for (Customer bauer : repository.findByLastNameStartsWithIgnoreCase("Bauer")) {
+			for (Kunde bauer : repository.findByNameStartsWithIgnoreCase("Bauer")) {
 				log.info(bauer.toString());
 			}
 			log.info("");

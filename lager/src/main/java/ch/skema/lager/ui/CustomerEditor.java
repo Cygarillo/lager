@@ -13,36 +13,35 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-import ch.skema.lager.domain.Customer;
-import ch.skema.lager.repository.CustomerRepository;
+import ch.skema.lager.domain.Kunde;
+import ch.skema.lager.repository.KundeRepository;
 
 @SpringComponent
 @UIScope
 public class CustomerEditor extends VerticalLayout {
 	private static final long serialVersionUID = 1L;
 
-	private final CustomerRepository repository;
+	private final KundeRepository repository;
 
 	/**
 	 * The currently edited customer
 	 */
-	private Customer customer;
+	private Kunde customer;
 
 	/* Fields to edit properties in Customer entity */
-	TextField firstName = new TextField("First name");
-	TextField lastName = new TextField("Last name");
+	TextField name = new TextField("Name");
 
 	/* Action buttons */
-	Button save = new Button("Save", FontAwesome.SAVE);
-	Button cancel = new Button("Cancel");
-	Button delete = new Button("Delete", FontAwesome.TRASH_O);
+	Button save = new Button("Speichern", FontAwesome.SAVE);
+	Button cancel = new Button("Abbrechen");
+	Button delete = new Button("Löschen", FontAwesome.TRASH_O);
 	CssLayout actions = new CssLayout(save, cancel, delete);
 
 	@Autowired
-	public CustomerEditor(CustomerRepository repository) {
+	public CustomerEditor(KundeRepository repository) {
 		this.repository = repository;
 
-		addComponents(firstName, lastName, actions);
+		addComponents(name, actions);
 
 		// Configure and style components
 		setSpacing(true);
@@ -62,7 +61,7 @@ public class CustomerEditor extends VerticalLayout {
 		void onChange();
 	}
 
-	public final void editCustomer(Customer c) {
+	public final void editCustomer(Kunde c) {
 		final boolean persisted = c.getId() != null;
 		if (persisted) {
 			// Find fresh entity for editing
@@ -82,7 +81,7 @@ public class CustomerEditor extends VerticalLayout {
 		// A hack to ensure the whole form is visible
 		save.focus();
 		// Select all text in firstName field automatically
-		firstName.selectAll();
+		name.selectAll();
 	}
 
 	public void setChangeHandler(ChangeHandler h) {

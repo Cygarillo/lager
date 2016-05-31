@@ -16,8 +16,8 @@ import com.vaadin.ui.Grid;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
-import ch.skema.lager.domain.Customer;
-import ch.skema.lager.repository.CustomerRepository;
+import ch.skema.lager.domain.Kunde;
+import ch.skema.lager.repository.KundeRepository;
 
 @SpringView(name = CustomerView.VIEW_NAME)
 @UIScope
@@ -34,7 +34,7 @@ public class CustomerView extends VerticalLayout implements View {
 	void init() {
 		this.grid = new Grid();
 		this.filter = new TextField();
-		this.addNewBtn = new Button("New customer", FontAwesome.PLUS);
+		this.addNewBtn = new Button("Neuer Kunde", FontAwesome.PLUS);
 		oldLayout();
 	}
 
@@ -44,7 +44,7 @@ public class CustomerView extends VerticalLayout implements View {
 	}
 
 	@Autowired
-	private CustomerRepository repo;
+	private KundeRepository repo;
 	@Autowired
 	private CustomerEditor editor;
 	private Grid grid;
@@ -63,9 +63,9 @@ public class CustomerView extends VerticalLayout implements View {
 		setSpacing(true);
 		grid.setWidth(70, Unit.PERCENTAGE);
 		grid.setHeight(320, Unit.PIXELS);
-		grid.setColumns("id", "firstName", "lastName");
+		grid.setColumns("name");
 
-		filter.setInputPrompt("Filter by last name");
+		filter.setInputPrompt("Nach Name filtern:");
 
 		// Hook logic to components
 
@@ -77,12 +77,12 @@ public class CustomerView extends VerticalLayout implements View {
 			if (e.getSelected().isEmpty()) {
 				editor.setVisible(false);
 			} else {
-				editor.editCustomer((Customer) grid.getSelectedRow());
+				editor.editCustomer((Kunde) grid.getSelectedRow());
 			}
 		});
 
 		// Instantiate and edit new Customer the new button is clicked
-		addNewBtn.addClickListener(e -> editor.editCustomer(new Customer("", "")));
+		addNewBtn.addClickListener(e -> editor.editCustomer(new Kunde("")));
 
 		// Listen changes made by the editor, refresh data from backend
 		editor.setChangeHandler(() -> {
@@ -96,9 +96,9 @@ public class CustomerView extends VerticalLayout implements View {
 
 	private void listCustomers(String text) {
 		if (StringUtils.isEmpty(text)) {
-			grid.setContainerDataSource(new BeanItemContainer(Customer.class, repo.findAll()));
+			grid.setContainerDataSource(new BeanItemContainer(Kunde.class, repo.findAll()));
 		} else {
-			grid.setContainerDataSource(new BeanItemContainer(Customer.class, repo.findByLastNameStartsWithIgnoreCase(text)));
+			grid.setContainerDataSource(new BeanItemContainer(Kunde.class, repo.findByNameStartsWithIgnoreCase(text)));
 		}
 	}
 
