@@ -29,12 +29,12 @@ public class VaadinUI extends UI {
 
 	@Override
 	protected void init(VaadinRequest request) {
-		newLayout();
+		createLayout();
 
 		registerEvents();// TODO
 	}
 
-	private void newLayout() {
+	private void createLayout() {
 		final VerticalLayout root = new VerticalLayout();
 		root.setSizeFull();
 		root.setMargin(true);
