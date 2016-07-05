@@ -3,6 +3,7 @@ package ch.skema.lager.domain;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class Produkt {
@@ -14,6 +15,7 @@ public class Produkt {
 	private Long einkaufspreisSl;
 	private Long einkaufspreisBern;
 	private Long abgaben;
+	@ManyToOne(targetEntity = Kategorie.class)
 	private Kategorie kategorie;
 
 	protected Produkt() {

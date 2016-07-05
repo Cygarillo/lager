@@ -13,15 +13,16 @@ import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
 import ch.skema.lager.domain.Kunde;
 import ch.skema.lager.repository.KundeRepository;
 
-@SpringView(name = CustomerView.VIEW_NAME)
+@SpringView(name = KundenView.VIEW_NAME)
 @UIScope
-public class CustomerView extends VerticalLayout implements View {
+public class KundenView extends VerticalLayout implements View {
 	private static final long serialVersionUID = 1L;
 	/*
 	 * This view is registered automatically based on the @SpringView
@@ -46,28 +47,28 @@ public class CustomerView extends VerticalLayout implements View {
 	@Autowired
 	private KundeRepository repo;
 	@Autowired
-	private CustomerEditor editor;
+	private KundeEditor editor;
 	private Grid grid;
 	private TextField filter;
 	private Button addNewBtn;
 
 	private void oldLayout() {
-		// build layout
-		addComponent(filter);
-		addComponent(addNewBtn);
-		addComponent(grid);
-		addComponent(editor);
 
-		// Configure layouts and components
-		setMargin(true);
-		setSpacing(true);
-		grid.setWidth(70, Unit.PERCENTAGE);
-		grid.setHeight(320, Unit.PIXELS);
+		HorizontalLayout toolbar = new HorizontalLayout(filter, addNewBtn);
+		toolbar.setSpacing(true);
 		grid.setColumns("name");
+		grid.setSizeFull();
+		HorizontalLayout main = new HorizontalLayout(grid, editor);
+		main.setSpacing(true);
+		main.setSizeFull();
+
+		// build layout
+		addComponent(toolbar);
+		addComponent(main);
+		setSpacing(true);
+		setMargin(true);
 
 		filter.setInputPrompt("Nach Name filtern:");
-
-		// Hook logic to components
 
 		// Replace listing with filtered content when user changes filter
 		filter.addTextChangeListener(e -> listCustomers(e.getText()));
@@ -100,6 +101,7 @@ public class CustomerView extends VerticalLayout implements View {
 		} else {
 			grid.setContainerDataSource(new BeanItemContainer(Kunde.class, repo.findByNameStartsWithIgnoreCase(text)));
 		}
+
 	}
 
 }

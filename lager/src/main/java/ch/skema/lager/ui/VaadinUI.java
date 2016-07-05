@@ -44,8 +44,10 @@ public class VaadinUI extends UI {
 		final CssLayout navigationBar = new CssLayout();
 		navigationBar.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
 
-		navigationBar.addComponent(createNavigationButton("Default View", DefaultView.VIEW_NAME));
-		navigationBar.addComponent(createNavigationButton("Customer View", CustomerView.VIEW_NAME));
+		navigationBar.addComponent(createNavigationButton("Bestellungen", BestellungView.VIEW_NAME));
+		navigationBar.addComponent(createNavigationButton("Produkte", ProduktView.VIEW_NAME));
+		navigationBar.addComponent(createNavigationButton("Kunden", KundenView.VIEW_NAME));
+		navigationBar.addComponent(createNavigationButton("Kategorien", KategorieView.VIEW_NAME));
 
 		root.addComponent(navigationBar);
 

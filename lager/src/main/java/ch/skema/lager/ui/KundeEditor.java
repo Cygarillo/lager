@@ -18,7 +18,7 @@ import ch.skema.lager.repository.KundeRepository;
 
 @SpringComponent
 @UIScope
-public class CustomerEditor extends VerticalLayout {
+public class KundeEditor extends VerticalLayout {
 	private static final long serialVersionUID = 1L;
 
 	private final KundeRepository repository;
@@ -34,11 +34,10 @@ public class CustomerEditor extends VerticalLayout {
 	/* Action buttons */
 	Button save = new Button("Speichern", FontAwesome.SAVE);
 	Button cancel = new Button("Abbrechen");
-	Button delete = new Button("Löschen", FontAwesome.TRASH_O);
-	CssLayout actions = new CssLayout(save, cancel, delete);
+	CssLayout actions = new CssLayout(save, cancel);
 
 	@Autowired
-	public CustomerEditor(KundeRepository repository) {
+	public KundeEditor(KundeRepository repository) {
 		this.repository = repository;
 
 		addComponents(name, actions);
@@ -51,7 +50,6 @@ public class CustomerEditor extends VerticalLayout {
 
 		// wire action buttons to save, delete and reset
 		save.addClickListener(e -> repository.save(customer));
-		delete.addClickListener(e -> repository.delete(customer));
 		cancel.addClickListener(e -> editCustomer(customer));
 		setVisible(false);
 	}
@@ -88,7 +86,7 @@ public class CustomerEditor extends VerticalLayout {
 		// ChangeHandler is notified when either save or delete
 		// is clicked
 		save.addClickListener(e -> h.onChange());
-		delete.addClickListener(e -> h.onChange());
+//		deactivate.addClickListener(e -> h.onChange());
 	}
 
 }

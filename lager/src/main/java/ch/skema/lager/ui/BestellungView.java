@@ -9,9 +9,9 @@ import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 
-@SpringView(name = DefaultView.VIEW_NAME)
+@SpringView(name = BestellungView.VIEW_NAME)
 @UIScope
-public class DefaultView extends VerticalLayout implements View {
+public class BestellungView extends VerticalLayout implements View {
 	private static final long serialVersionUID = 1L;
 	/*
 	 * This view is registered automatically based on the @SpringView
@@ -22,7 +22,7 @@ public class DefaultView extends VerticalLayout implements View {
 
 	@PostConstruct
 	void init() {
-		addComponent(new Label("Welcome View"));
+		addComponent(new Label("Bestellungen"));
 	}
 
 	@Override
