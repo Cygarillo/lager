@@ -15,6 +15,16 @@ public class Produkt {
 	private Long einkaufspreisSl;
 	private Long einkaufspreisBern;
 	private Long abgaben;
+	private boolean aktiv;
+
+	public boolean isAktiv() {
+		return aktiv;
+	}
+
+	public void setAktiv(boolean aktiv) {
+		this.aktiv = aktiv;
+	}
+
 	@ManyToOne(targetEntity = Kategorie.class)
 	private Kategorie kategorie;
 
