@@ -3,6 +3,7 @@ package ch.skema.lager.ui;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.spring.annotation.SpringComponent;
@@ -15,7 +16,9 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+import ch.skema.lager.domain.Kategorie;
 import ch.skema.lager.domain.Produkt;
+import ch.skema.lager.repository.KategorieRepository;
 import ch.skema.lager.repository.ProduktRepository;
 
 @SpringComponent
@@ -48,7 +51,7 @@ public class ProduktEditor extends VerticalLayout {
 	CssLayout actions = new CssLayout(save, cancel);
 
 	@Autowired
-	public ProduktEditor(ProduktRepository repository) {
+	public ProduktEditor(ProduktRepository repository, KategorieRepository katRepo) {
 		this.repository = repository;
 		verkaufspreis.setNullRepresentation("");
 		einkaufspreisSl.setNullRepresentation("");
@@ -58,6 +61,10 @@ public class ProduktEditor extends VerticalLayout {
 
 		kategorie.setInvalidAllowed(false);
 		kategorie.setNullSelectionAllowed(false);
+
+		kategorie.setContainerDataSource(new BeanItemContainer(Kategorie.class, katRepo.findAll()));
+
+		kategorie.setItemCaptionPropertyId("name");
 
 		addComponents(name, kategorie, verkaufspreis, einkaufspreisSl, einkaufspreisBern, abgaben, aktiv, actions);
 

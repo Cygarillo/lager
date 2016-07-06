@@ -56,7 +56,8 @@ public class ProduktView extends VerticalLayout implements View {
 
 		HorizontalLayout toolbar = new HorizontalLayout(filter, addNewBtn);
 		toolbar.setSpacing(true);
-		grid.setColumns("name", "verkaufspreis", "einkaufspreisSl", "einkaufspreisBern", "abgaben", "aktiv");
+		grid.setColumns("name", "kategorie", "verkaufspreis", "einkaufspreisSl", "einkaufspreisBern", "abgaben", "aktiv");
+
 		grid.setSizeFull();
 		HorizontalLayout main = new HorizontalLayout(grid, editor);
 		main.setSpacing(true);
