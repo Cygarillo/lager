@@ -17,6 +17,9 @@ public class Produkt {
 	private Long abgaben;
 	private boolean aktiv;
 
+	@ManyToOne(targetEntity = Kategorie.class)
+	private Kategorie kategorie;
+
 	public boolean isAktiv() {
 		return aktiv;
 	}
@@ -24,9 +27,6 @@ public class Produkt {
 	public void setAktiv(boolean aktiv) {
 		this.aktiv = aktiv;
 	}
-
-	@ManyToOne(targetEntity = Kategorie.class)
-	private Kategorie kategorie;
 
 	protected Produkt() {
 	}
