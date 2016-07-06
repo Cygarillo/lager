@@ -7,7 +7,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import ch.skema.lager.domain.Kategorie;
 import ch.skema.lager.domain.Kunde;
+import ch.skema.lager.repository.KategorieRepository;
 import ch.skema.lager.repository.KundeRepository;
 
 @SpringBootApplication
@@ -20,7 +22,7 @@ public class App {
 	}
 
 	@Bean
-	public CommandLineRunner loadData(KundeRepository repository) {
+	public CommandLineRunner loadData(KundeRepository repository, KategorieRepository katRepo) {
 		return (args) -> {
 			// save a couple of customers
 			repository.save(new Kunde("Jack Bauer"));
@@ -28,6 +30,10 @@ public class App {
 			repository.save(new Kunde("Kim Bauer"));
 			repository.save(new Kunde("David Palmer"));
 			repository.save(new Kunde("Michelle Dessler"));
+
+			katRepo.save(new Kategorie("Salz"));
+			katRepo.save(new Kategorie("Seifen"));
+			katRepo.save(new Kategorie("Nahrung"));
 
 			// fetch all customers
 			log.info("Customers found with findAll():");
