@@ -9,6 +9,7 @@ import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
@@ -37,6 +38,7 @@ public class ProduktEditor extends VerticalLayout {
 	TextField einkaufspreisBern = new TextField("Einkaufspreis Bern");
 	TextField abgaben = new TextField("Abgaben");
 	CheckBox aktiv = new CheckBox("Aktiv");
+	ComboBox kategorie = new ComboBox("Wähle Kategorie");
 
 	// TextField aktiv = new TextField("Produktname");;
 
@@ -54,7 +56,10 @@ public class ProduktEditor extends VerticalLayout {
 		abgaben.setNullRepresentation("");
 		aktiv.setValue(true);
 
-		addComponents(name, verkaufspreis, einkaufspreisSl, einkaufspreisBern, abgaben, aktiv, actions);
+		kategorie.setInvalidAllowed(false);
+		kategorie.setNullSelectionAllowed(false);
+
+		addComponents(name, kategorie, verkaufspreis, einkaufspreisSl, einkaufspreisBern, abgaben, aktiv, actions);
 
 		// Configure and style components
 		setSpacing(true);
