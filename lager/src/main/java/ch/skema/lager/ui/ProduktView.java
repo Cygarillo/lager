@@ -17,8 +17,8 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
-import ch.skema.lager.domain.Kunde;
-import ch.skema.lager.repository.KundeRepository;
+import ch.skema.lager.domain.Produkt;
+import ch.skema.lager.repository.ProduktRepository;
 
 @SpringView(name = ProduktView.VIEW_NAME)
 @UIScope
@@ -45,9 +45,9 @@ public class ProduktView extends VerticalLayout implements View {
 	}
 
 	@Autowired
-	private KundeRepository repo;
+	private ProduktRepository repo;
 	@Autowired
-	private KundeEditor editor;
+	private ProduktEditor editor;
 	private Grid grid;
 	private TextField filter;
 	private Button addNewBtn;
@@ -78,12 +78,12 @@ public class ProduktView extends VerticalLayout implements View {
 			if (e.getSelected().isEmpty()) {
 				editor.setVisible(false);
 			} else {
-				editor.editCustomer((Kunde) grid.getSelectedRow());
+				editor.editProdukt((Produkt) grid.getSelectedRow());
 			}
 		});
 
 		// Instantiate and edit new Customer the new button is clicked
-		addNewBtn.addClickListener(e -> editor.editCustomer(new Kunde("")));
+		addNewBtn.addClickListener(e -> editor.editProdukt(new Produkt("")));
 
 		// Listen changes made by the editor, refresh data from backend
 		editor.setChangeHandler(() -> {
@@ -97,9 +97,9 @@ public class ProduktView extends VerticalLayout implements View {
 
 	private void listCustomers(String text) {
 		if (StringUtils.isEmpty(text)) {
-			grid.setContainerDataSource(new BeanItemContainer(Kunde.class, repo.findAll()));
+			grid.setContainerDataSource(new BeanItemContainer(Produkt.class, repo.findAll()));
 		} else {
-			grid.setContainerDataSource(new BeanItemContainer(Kunde.class, repo.findByNameStartsWithIgnoreCase(text)));
+			grid.setContainerDataSource(new BeanItemContainer(Produkt.class, repo.findByNameStartsWithIgnoreCase(text)));
 		}
 
 	}
