@@ -8,6 +8,7 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
@@ -31,10 +32,12 @@ public class ProduktEditor extends VerticalLayout {
 	/* Fields to edit properties in Product entity */
 	TextField name = new TextField("Produktname");
 
-	TextField verkaufspreis = new TextField("Verkaufspreis an Schüler");;
-	TextField einkaufspreisSl = new TextField("Einkaufspreis Schulleiter");;
-	TextField einkaufspreisBern = new TextField("Einkaufspreis Bern");;
-	TextField abgaben = new TextField("Abgaben");;
+	TextField verkaufspreis = new TextField("Verkaufspreis an Schüler");
+	TextField einkaufspreisSl = new TextField("Einkaufspreis Schulleiter");
+	TextField einkaufspreisBern = new TextField("Einkaufspreis Bern");
+	TextField abgaben = new TextField("Abgaben");
+	CheckBox aktiv = new CheckBox("Aktiv");
+
 	// TextField aktiv = new TextField("Produktname");;
 
 	/* Action buttons */
@@ -49,8 +52,9 @@ public class ProduktEditor extends VerticalLayout {
 		einkaufspreisSl.setNullRepresentation("");
 		einkaufspreisBern.setNullRepresentation("");
 		abgaben.setNullRepresentation("");
+		aktiv.setValue(true);
 
-		addComponents(name, verkaufspreis, einkaufspreisSl, einkaufspreisBern, abgaben, actions);
+		addComponents(name, verkaufspreis, einkaufspreisSl, einkaufspreisBern, abgaben, aktiv, actions);
 
 		// Configure and style components
 		setSpacing(true);
