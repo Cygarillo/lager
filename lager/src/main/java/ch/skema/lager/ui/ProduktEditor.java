@@ -1,5 +1,7 @@
 package ch.skema.lager.ui;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
@@ -18,15 +20,19 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import ch.skema.lager.domain.Kategorie;
 import ch.skema.lager.domain.Produkt;
+import ch.skema.lager.event.EventSystem;
+import ch.skema.lager.event.KategorieEvent;
+import ch.skema.lager.event.KategorieEvent.KategorieEventListener;
 import ch.skema.lager.repository.KategorieRepository;
 import ch.skema.lager.repository.ProduktRepository;
 
 @SpringComponent
 @UIScope
-public class ProduktEditor extends VerticalLayout {
+public class ProduktEditor extends VerticalLayout implements KategorieEventListener {
 	private static final long serialVersionUID = 1L;
 
 	private final ProduktRepository repository;
+	private final KategorieRepository kategorieRepository;
 
 	/**
 	 * The currently edited customer
@@ -43,6 +49,8 @@ public class ProduktEditor extends VerticalLayout {
 	CheckBox aktiv = new CheckBox("Aktiv");
 	ComboBox kategorie = new ComboBox("Wähle Kategorie");
 
+	EventSystem eventSystem;
+
 	// TextField aktiv = new TextField("Produktname");;
 
 	/* Action buttons */
@@ -51,18 +59,19 @@ public class ProduktEditor extends VerticalLayout {
 	CssLayout actions = new CssLayout(save, cancel);
 
 	@Autowired
-	public ProduktEditor(ProduktRepository repository, KategorieRepository katRepo) {
+	public ProduktEditor(ProduktRepository repository, KategorieRepository katRepo, EventSystem eventSystem) {
 		this.repository = repository;
+		this.kategorieRepository = katRepo;
+		this.eventSystem = eventSystem;
 		verkaufspreis.setNullRepresentation("");
 		einkaufspreisSl.setNullRepresentation("");
 		einkaufspreisBern.setNullRepresentation("");
 		abgaben.setNullRepresentation("");
-		aktiv.setValue(true);
 
 		kategorie.setInvalidAllowed(false);
 		kategorie.setNullSelectionAllowed(false);
 
-		kategorie.setContainerDataSource(new BeanItemContainer(Kategorie.class, katRepo.findAll()));
+		shizzel();
 
 		kategorie.setItemCaptionPropertyId("name");
 
@@ -78,6 +87,17 @@ public class ProduktEditor extends VerticalLayout {
 		save.addClickListener(e -> repository.save(product));
 		cancel.addClickListener(e -> editProdukt(product));
 		setVisible(false);
+
+		eventSystem.addListener(this);
+
+	}
+
+	private void shizzel() {
+		kategorie.setContainerDataSource(new BeanItemContainer(Kategorie.class, loadKategorieComboBoxData()));
+	}
+
+	private List<Kategorie> loadKategorieComboBoxData() {
+		return kategorieRepository.findAll();
 	}
 
 	public interface ChangeHandler {
@@ -99,7 +119,6 @@ public class ProduktEditor extends VerticalLayout {
 		// Could also use annotation or "manual binding" or programmatically
 		// moving values from fields to entities before saving
 		BeanFieldGroup.bindFieldsUnbuffered(product, this);
-
 		setVisible(true);
 
 		// A hack to ensure the whole form is visible
@@ -113,6 +132,11 @@ public class ProduktEditor extends VerticalLayout {
 		// is clicked
 		save.addClickListener(e -> h.onChange());
 //		deactivate.addClickListener(e -> h.onChange());
+	}
+
+	@Override
+	public void reloadEntries(KategorieEvent event) {
+		shizzel();
 	}
 
 }

@@ -29,6 +29,7 @@ public class Produkt {
 	}
 
 	protected Produkt() {
+		aktiv = true;
 	}
 
 	public Produkt(String name) {

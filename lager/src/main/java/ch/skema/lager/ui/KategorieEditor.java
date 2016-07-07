@@ -14,6 +14,8 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 import ch.skema.lager.domain.Kategorie;
+import ch.skema.lager.event.EventSystem;
+import ch.skema.lager.event.KategorieEvent;
 import ch.skema.lager.repository.KategorieRepository;
 
 @SpringComponent
@@ -24,6 +26,8 @@ public class KategorieEditor extends VerticalLayout {
 	private final KategorieRepository repository;
 
 	private Kategorie kategorie;
+	@Autowired
+	EventSystem eventSystem;
 
 	/* Fields to edit properties in Customer entity */
 	TextField name = new TextField("Name");
@@ -46,7 +50,10 @@ public class KategorieEditor extends VerticalLayout {
 		save.setClickShortcut(ShortcutAction.KeyCode.ENTER);
 
 		// wire action buttons to save, delete and reset
-		save.addClickListener(e -> repository.save(kategorie));
+		save.addClickListener(e -> {
+			repository.save(kategorie);
+			eventSystem.fire(new KategorieEvent());
+		});
 		cancel.addClickListener(e -> edit(kategorie));
 		setVisible(false);
 	}

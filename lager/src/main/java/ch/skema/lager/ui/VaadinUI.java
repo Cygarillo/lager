@@ -15,6 +15,8 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 import ch.skema.lager.event.EventSystem;
+import ch.skema.lager.event.KategorieEvent;
+import ch.skema.lager.event.KategorieEvent.KategorieEventListener;
 
 @SpringUI
 @Theme("valo")
@@ -29,12 +31,12 @@ public class VaadinUI extends UI {
 
 	@Override
 	protected void init(VaadinRequest request) {
-		createLayout();
+		newLayout();
 
 		registerEvents();// TODO
 	}
 
-	private void createLayout() {
+	private void newLayout() {
 		final VerticalLayout root = new VerticalLayout();
 		root.setSizeFull();
 		root.setMargin(true);
@@ -69,7 +71,7 @@ public class VaadinUI extends UI {
 	}
 
 	private void registerEvents() {
-//		eventSystem.registerEvent(ReloadEntriesEvent.ReloadEntriesListener.class, ReloadEntriesEvent.class);
+		eventSystem.registerEvent(KategorieEventListener.class, KategorieEvent.class);
 	}
 
 }
