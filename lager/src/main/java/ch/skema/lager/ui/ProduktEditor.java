@@ -1,7 +1,5 @@
 package ch.skema.lager.ui;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
@@ -71,7 +69,7 @@ public class ProduktEditor extends VerticalLayout implements KategorieEventListe
 		kategorie.setInvalidAllowed(false);
 		kategorie.setNullSelectionAllowed(false);
 
-		shizzel();
+		reloadKategories();
 
 		kategorie.setItemCaptionPropertyId("name");
 
@@ -92,16 +90,13 @@ public class ProduktEditor extends VerticalLayout implements KategorieEventListe
 
 	}
 
-	private void shizzel() {
-		kategorie.setContainerDataSource(new BeanItemContainer(Kategorie.class, loadKategorieComboBoxData()));
-	}
-
-	private List<Kategorie> loadKategorieComboBoxData() {
-		return kategorieRepository.findAll();
+	private void reloadKategories() {
+		BeanItemContainer<Kategorie> container = new BeanItemContainer<>(Kategorie.class, kategorieRepository.findAll());
+		kategorie.setContainerDataSource(container);
+		kategorie.select(container.firstItemId());
 	}
 
 	public interface ChangeHandler {
-
 		void onChange();
 	}
 
@@ -112,6 +107,7 @@ public class ProduktEditor extends VerticalLayout implements KategorieEventListe
 			product = repository.findOne(c.getId());
 		} else {
 			product = c;
+			product.setKategorie((Kategorie) kategorie.getConvertedValue());//default kategorie
 		}
 		cancel.setVisible(persisted);
 
@@ -136,7 +132,7 @@ public class ProduktEditor extends VerticalLayout implements KategorieEventListe
 
 	@Override
 	public void reloadEntries(KategorieEvent event) {
-		shizzel();
+		reloadKategories();
 	}
 
 }
