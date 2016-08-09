@@ -15,7 +15,7 @@ public class Produkt {
 	private Long einkaufspreisSl;
 	private Long einkaufspreisBern;
 	private Long abgaben;
-	private boolean aktiv;
+	private boolean aktiv = true;
 
 	@ManyToOne(targetEntity = Kategorie.class)
 	private Kategorie kategorie;
@@ -29,7 +29,6 @@ public class Produkt {
 	}
 
 	protected Produkt() {
-		aktiv = true;
 	}
 
 	public Produkt(String name) {
