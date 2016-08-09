@@ -56,7 +56,8 @@ public class ProduktView extends VerticalLayout implements View {
 
 		HorizontalLayout toolbar = new HorizontalLayout(filter, addNewBtn);
 		toolbar.setSpacing(true);
-		grid.setColumns("name", "kategorie", "verkaufspreis", "einkaufspreisSl", "einkaufspreisBern", "abgaben", "aktiv");
+		grid.setColumns("name", "kategorie.name", "verkaufspreis", "einkaufspreisSl", "einkaufspreisBern", "abgaben", "aktiv");
+		grid.getColumn("kategorie.name").setHeaderCaption("Kategorie");
 
 		grid.setSizeFull();
 		HorizontalLayout main = new HorizontalLayout(grid, editor);
@@ -98,7 +99,9 @@ public class ProduktView extends VerticalLayout implements View {
 
 	private void listCustomers(String text) {
 		if (StringUtils.isEmpty(text)) {
-			grid.setContainerDataSource(new BeanItemContainer(Produkt.class, repo.findAll()));
+			BeanItemContainer container = new BeanItemContainer(Produkt.class, repo.findAll());
+			container.addNestedContainerProperty("kategorie.name");
+			grid.setContainerDataSource(container);
 		} else {
 			grid.setContainerDataSource(new BeanItemContainer(Produkt.class, repo.findByNameStartsWithIgnoreCase(text)));
 		}
