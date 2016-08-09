@@ -97,9 +97,9 @@ public class KundenView extends VerticalLayout implements View {
 
 	private void listCustomers(String text) {
 		if (StringUtils.isEmpty(text)) {
-			grid.setContainerDataSource(new BeanItemContainer(Kunde.class, repo.findAll()));
+			grid.setContainerDataSource(new BeanItemContainer<>(Kunde.class, repo.findAll()));
 		} else {
-			grid.setContainerDataSource(new BeanItemContainer(Kunde.class, repo.findByNameStartsWithIgnoreCase(text)));
+			grid.setContainerDataSource(new BeanItemContainer<>(Kunde.class, repo.findByNameStartsWithIgnoreCase(text)));
 		}
 
 	}

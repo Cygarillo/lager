@@ -36,7 +36,7 @@ public class ProduktView extends VerticalLayout implements View {
 		this.grid = new Grid();
 		this.filter = new TextField();
 		this.addNewBtn = new Button("Neues Produkt", FontAwesome.PLUS);
-		oldLayout();
+		buildLayout();
 	}
 
 	@Override
@@ -52,8 +52,7 @@ public class ProduktView extends VerticalLayout implements View {
 	private TextField filter;
 	private Button addNewBtn;
 
-	private void oldLayout() {
-
+	private void buildLayout() {
 		HorizontalLayout toolbar = new HorizontalLayout(filter, addNewBtn);
 		toolbar.setSpacing(true);
 		grid.setColumns("name", "kategorie.name", "verkaufspreis", "einkaufspreisSl", "einkaufspreisBern", "abgaben", "aktiv");
@@ -99,11 +98,11 @@ public class ProduktView extends VerticalLayout implements View {
 
 	private void listCustomers(String text) {
 		if (StringUtils.isEmpty(text)) {
-			BeanItemContainer container = new BeanItemContainer(Produkt.class, repo.findAll());
+			BeanItemContainer<Produkt> container = new BeanItemContainer<>(Produkt.class, repo.findAll());
 			container.addNestedContainerProperty("kategorie.name");
 			grid.setContainerDataSource(container);
 		} else {
-			grid.setContainerDataSource(new BeanItemContainer(Produkt.class, repo.findByNameStartsWithIgnoreCase(text)));
+			grid.setContainerDataSource(new BeanItemContainer<>(Produkt.class, repo.findByNameStartsWithIgnoreCase(text)));
 		}
 
 	}
