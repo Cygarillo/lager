@@ -13,6 +13,7 @@ import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
@@ -52,17 +53,24 @@ public class KategorieView extends VerticalLayout implements View {
 	private Button addNewBtn;
 
 	private void initLayout() {
+		HorizontalLayout toolbar = new HorizontalLayout(filter, addNewBtn);
+		toolbar.setSpacing(true);
+
+		HorizontalLayout main = new HorizontalLayout(grid, editor);
+		main.setSpacing(true);
+		main.setSizeFull();
+
+		main.setExpandRatio(grid, 2);
+		main.setExpandRatio(editor, 1);
+
 		// build layout
-		addComponent(filter);
-		addComponent(addNewBtn);
-		addComponent(grid);
-		addComponent(editor);
+		addComponent(toolbar);
+		addComponent(main);
 
 		// Configure layouts and components
 		setMargin(true);
 		setSpacing(true);
-		grid.setWidth(70, Unit.PERCENTAGE);
-		grid.setHeight(320, Unit.PIXELS);
+		grid.setSizeFull();
 		grid.setColumns("name");
 
 		filter.setInputPrompt("Nach Name filtern:");

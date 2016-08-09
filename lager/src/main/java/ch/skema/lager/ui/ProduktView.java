@@ -1,5 +1,7 @@
 package ch.skema.lager.ui;
 
+import java.util.List;
+
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,11 +59,14 @@ public class ProduktView extends VerticalLayout implements View {
 		toolbar.setSpacing(true);
 		grid.setColumns("name", "kategorie.name", "verkaufspreis", "einkaufspreisSl", "einkaufspreisBern", "abgaben", "aktiv");
 		grid.getColumn("kategorie.name").setHeaderCaption("Kategorie");
-
 		grid.setSizeFull();
+
 		HorizontalLayout main = new HorizontalLayout(grid, editor);
 		main.setSpacing(true);
 		main.setSizeFull();
+
+		main.setExpandRatio(grid, 2);
+		main.setExpandRatio(editor, 1);
 
 		// build layout
 		addComponent(toolbar);
@@ -98,13 +103,16 @@ public class ProduktView extends VerticalLayout implements View {
 
 	private void listCustomers(String text) {
 		if (StringUtils.isEmpty(text)) {
-			BeanItemContainer<Produkt> container = new BeanItemContainer<>(Produkt.class, repo.findAll());
-			container.addNestedContainerProperty("kategorie.name");
-			grid.setContainerDataSource(container);
+			grid.setContainerDataSource(createProduktBeanItemContainer(repo.findAll()));
 		} else {
-			grid.setContainerDataSource(new BeanItemContainer<>(Produkt.class, repo.findByNameStartsWithIgnoreCase(text)));
+			grid.setContainerDataSource(createProduktBeanItemContainer(repo.findByNameStartsWithIgnoreCase(text)));
 		}
+	}
 
+	private BeanItemContainer<Produkt> createProduktBeanItemContainer(List<Produkt> findAll) {
+		BeanItemContainer<Produkt> container = new BeanItemContainer<>(Produkt.class, findAll);
+		container.addNestedContainerProperty("kategorie.name");
+		return container;
 	}
 
 }

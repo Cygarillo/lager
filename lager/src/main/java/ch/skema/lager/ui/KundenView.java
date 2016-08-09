@@ -53,7 +53,6 @@ public class KundenView extends VerticalLayout implements View {
 	private Button addNewBtn;
 
 	private void oldLayout() {
-
 		HorizontalLayout toolbar = new HorizontalLayout(filter, addNewBtn);
 		toolbar.setSpacing(true);
 		grid.setColumns("name");
@@ -61,6 +60,9 @@ public class KundenView extends VerticalLayout implements View {
 		HorizontalLayout main = new HorizontalLayout(grid, editor);
 		main.setSpacing(true);
 		main.setSizeFull();
+
+		main.setExpandRatio(grid, 2);
+		main.setExpandRatio(editor, 1);
 
 		// build layout
 		addComponent(toolbar);
@@ -88,6 +90,7 @@ public class KundenView extends VerticalLayout implements View {
 		// Listen changes made by the editor, refresh data from backend
 		editor.setChangeHandler(() -> {
 			editor.setVisible(false);
+			editor.setSpacing(false);
 			listCustomers(filter.getValue());
 		});
 
