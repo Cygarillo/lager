@@ -33,6 +33,13 @@ public class ProduktView extends VerticalLayout implements View {
 	 * when navigating to the Homepage
 	 */
 	public static final String VIEW_NAME = "ProdukteView";
+	@Autowired
+	private ProduktRepository repo;
+	@Autowired
+	private ProduktEditor editor;
+	private Grid grid;
+	private TextField filter;
+	private Button addNewBtn;
 
 	@PostConstruct
 	void init() {
@@ -46,14 +53,6 @@ public class ProduktView extends VerticalLayout implements View {
 	public void enter(ViewChangeEvent event) {
 		// the view is constructed in the init() method()
 	}
-
-	@Autowired
-	private ProduktRepository repo;
-	@Autowired
-	private ProduktEditor editor;
-	private Grid grid;
-	private TextField filter;
-	private Button addNewBtn;
 
 	private void buildLayout() {
 		HorizontalLayout toolbar = new HorizontalLayout(filter, addNewBtn);
