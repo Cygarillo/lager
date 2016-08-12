@@ -1,5 +1,7 @@
 package ch.skema.lager.domain;
 
+import java.math.BigDecimal;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -11,10 +13,10 @@ public class Produkt {
 	@GeneratedValue
 	private Long id;
 	private String name;
-	private Long verkaufspreis;
-	private Long einkaufspreisSl;
-	private Long einkaufspreisBern;
-	private Long abgaben;
+	private BigDecimal verkaufspreis;
+	private BigDecimal einkaufspreisSl;
+	private BigDecimal einkaufspreisBern;
+	private BigDecimal abgaben;
 	private boolean aktiv = true;
 
 	@ManyToOne(targetEntity = Kategorie.class)
@@ -47,35 +49,35 @@ public class Produkt {
 		this.name = name;
 	}
 
-	public Long getVerkaufspreis() {
+	public BigDecimal getVerkaufspreis() {
 		return verkaufspreis;
 	}
 
-	public void setVerkaufspreis(Long verkaufspreis) {
+	public void setVerkaufspreis(BigDecimal verkaufspreis) {
 		this.verkaufspreis = verkaufspreis;
 	}
 
-	public Long getEinkaufspreisSl() {
+	public BigDecimal getEinkaufspreisSl() {
 		return einkaufspreisSl;
 	}
 
-	public void setEinkaufspreisSl(Long einkaufspreisSl) {
+	public void setEinkaufspreisSl(BigDecimal einkaufspreisSl) {
 		this.einkaufspreisSl = einkaufspreisSl;
 	}
 
-	public Long getEinkaufspreisBern() {
+	public BigDecimal getEinkaufspreisBern() {
 		return einkaufspreisBern;
 	}
 
-	public void setEinkaufspreisBern(Long einkaufspreisBern) {
+	public void setEinkaufspreisBern(BigDecimal einkaufspreisBern) {
 		this.einkaufspreisBern = einkaufspreisBern;
 	}
 
-	public Long getAbgaben() {
+	public BigDecimal getAbgaben() {
 		return abgaben;
 	}
 
-	public void setAbgaben(Long abgaben) {
+	public void setAbgaben(BigDecimal abgaben) {
 		this.abgaben = abgaben;
 	}
 
