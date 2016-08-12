@@ -33,7 +33,7 @@ public class VaadinUI extends UI {
 	protected void init(VaadinRequest request) {
 		newLayout();
 
-		registerEvents();// TODO
+		registerEvents();
 	}
 
 	private void newLayout() {
