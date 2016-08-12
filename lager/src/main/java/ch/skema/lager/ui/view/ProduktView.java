@@ -1,4 +1,6 @@
-package ch.skema.lager.ui;
+package ch.skema.lager.ui.view;
+
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 
@@ -17,26 +19,27 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
-import ch.skema.lager.domain.Kunde;
-import ch.skema.lager.repository.KundeRepository;
+import ch.skema.lager.domain.Produkt;
+import ch.skema.lager.repository.ProduktRepository;
+import ch.skema.lager.ui.editor.ProduktEditor;
 
-@SpringView(name = KundenView.VIEW_NAME)
+@SpringView(name = ProduktView.VIEW_NAME)
 @UIScope
-public class KundenView extends VerticalLayout implements View {
+public class ProduktView extends VerticalLayout implements View {
 	private static final long serialVersionUID = 1L;
 	/*
 	 * This view is registered automatically based on the @SpringView
 	 * annotation. As it has an empty string as its view name, it will be shown
 	 * when navigating to the Homepage
 	 */
-	public static final String VIEW_NAME = "customerView";
+	public static final String VIEW_NAME = "ProdukteView";
 
 	@PostConstruct
 	void init() {
 		this.grid = new Grid();
 		this.filter = new TextField();
-		this.addNewBtn = new Button("Neuer Kunde", FontAwesome.PLUS);
-		oldLayout();
+		this.addNewBtn = new Button("Neues Produkt", FontAwesome.PLUS);
+		buildLayout();
 	}
 
 	@Override
@@ -45,18 +48,20 @@ public class KundenView extends VerticalLayout implements View {
 	}
 
 	@Autowired
-	private KundeRepository repo;
+	private ProduktRepository repo;
 	@Autowired
-	private KundeEditor editor;
+	private ProduktEditor editor;
 	private Grid grid;
 	private TextField filter;
 	private Button addNewBtn;
 
-	private void oldLayout() {
+	private void buildLayout() {
 		HorizontalLayout toolbar = new HorizontalLayout(filter, addNewBtn);
 		toolbar.setSpacing(true);
-		grid.setColumns("name");
+		grid.setColumns("name", "kategorie.name", "verkaufspreis", "einkaufspreisSl", "einkaufspreisBern", "abgaben", "aktiv");
+		grid.getColumn("kategorie.name").setHeaderCaption("Kategorie");
 		grid.setSizeFull();
+
 		HorizontalLayout main = new HorizontalLayout(grid, editor);
 		main.setSpacing(true);
 		main.setSizeFull();
@@ -80,17 +85,16 @@ public class KundenView extends VerticalLayout implements View {
 			if (e.getSelected().isEmpty()) {
 				editor.setVisible(false);
 			} else {
-				editor.editCustomer((Kunde) grid.getSelectedRow());
+				editor.editProdukt((Produkt) grid.getSelectedRow());
 			}
 		});
 
 		// Instantiate and edit new Customer the new button is clicked
-		addNewBtn.addClickListener(e -> editor.editCustomer(new Kunde("")));
+		addNewBtn.addClickListener(e -> editor.editProdukt(new Produkt("")));
 
 		// Listen changes made by the editor, refresh data from backend
 		editor.setChangeHandler(() -> {
 			editor.setVisible(false);
-			editor.setSpacing(false);
 			listCustomers(filter.getValue());
 		});
 
@@ -100,11 +104,16 @@ public class KundenView extends VerticalLayout implements View {
 
 	private void listCustomers(String text) {
 		if (StringUtils.isEmpty(text)) {
-			grid.setContainerDataSource(new BeanItemContainer<>(Kunde.class, repo.findAll()));
+			grid.setContainerDataSource(createProduktBeanItemContainer(repo.findAll()));
 		} else {
-			grid.setContainerDataSource(new BeanItemContainer<>(Kunde.class, repo.findByNameStartsWithIgnoreCase(text)));
+			grid.setContainerDataSource(createProduktBeanItemContainer(repo.findByNameStartsWithIgnoreCase(text)));
 		}
+	}
 
+	private BeanItemContainer<Produkt> createProduktBeanItemContainer(List<Produkt> findAll) {
+		BeanItemContainer<Produkt> container = new BeanItemContainer<>(Produkt.class, findAll);
+		container.addNestedContainerProperty("kategorie.name");
+		return container;
 	}
 
 }

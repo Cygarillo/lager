@@ -1,4 +1,4 @@
-package ch.skema.lager.ui;
+package ch.skema.lager.ui.view;
 
 import javax.annotation.PostConstruct;
 

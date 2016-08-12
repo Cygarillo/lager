@@ -17,6 +17,10 @@ import com.vaadin.ui.themes.ValoTheme;
 import ch.skema.lager.event.EventSystem;
 import ch.skema.lager.event.KategorieEvent;
 import ch.skema.lager.event.KategorieEvent.KategorieEventListener;
+import ch.skema.lager.ui.view.BestellungView;
+import ch.skema.lager.ui.view.KategorieView;
+import ch.skema.lager.ui.view.KundenView;
+import ch.skema.lager.ui.view.ProduktView;
 
 @SpringUI
 @Theme("valo")

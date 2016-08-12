@@ -1,4 +1,4 @@
-package ch.skema.lager.ui;
+package ch.skema.lager.ui.editor;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -13,20 +13,21 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-import ch.skema.lager.domain.Kunde;
-import ch.skema.lager.repository.KundeRepository;
+import ch.skema.lager.domain.Kategorie;
+import ch.skema.lager.event.EventSystem;
+import ch.skema.lager.event.KategorieEvent;
+import ch.skema.lager.repository.KategorieRepository;
 
 @SpringComponent
 @UIScope
-public class KundeEditor extends VerticalLayout {
+public class KategorieEditor extends VerticalLayout {
 	private static final long serialVersionUID = 1L;
 
-	private final KundeRepository repository;
+	private final KategorieRepository repository;
 
-	/**
-	 * The currently edited customer
-	 */
-	private Kunde customer;
+	private Kategorie kategorie;
+	@Autowired
+	EventSystem eventSystem;
 
 	/* Fields to edit properties in Customer entity */
 	TextField name = new TextField("Name");
@@ -37,7 +38,7 @@ public class KundeEditor extends VerticalLayout {
 	CssLayout actions = new CssLayout(save, cancel);
 
 	@Autowired
-	public KundeEditor(KundeRepository repository) {
+	public KategorieEditor(KategorieRepository repository) {
 		this.repository = repository;
 
 		addComponents(name, actions);
@@ -49,8 +50,11 @@ public class KundeEditor extends VerticalLayout {
 		save.setClickShortcut(ShortcutAction.KeyCode.ENTER);
 
 		// wire action buttons to save, delete and reset
-		save.addClickListener(e -> repository.save(customer));
-		cancel.addClickListener(e -> editCustomer(customer));
+		save.addClickListener(e -> {
+			repository.save(kategorie);
+			eventSystem.fire(new KategorieEvent());
+		});
+		cancel.addClickListener(e -> edit(kategorie));
 		setVisible(false);
 	}
 
@@ -59,20 +63,20 @@ public class KundeEditor extends VerticalLayout {
 		void onChange();
 	}
 
-	public final void editCustomer(Kunde c) {
+	public final void edit(Kategorie c) {
 		final boolean persisted = c.getId() != null;
 		if (persisted) {
 			// Find fresh entity for editing
-			customer = repository.findOne(c.getId());
+			kategorie = repository.findOne(c.getId());
 		} else {
-			customer = c;
+			kategorie = c;
 		}
 		cancel.setVisible(persisted);
 
 		// Bind customer properties to similarly named fields
 		// Could also use annotation or "manual binding" or programmatically
 		// moving values from fields to entities before saving
-		BeanFieldGroup.bindFieldsUnbuffered(customer, this);
+		BeanFieldGroup.bindFieldsUnbuffered(kategorie, this);
 
 		setVisible(true);
 
@@ -86,7 +90,6 @@ public class KundeEditor extends VerticalLayout {
 		// ChangeHandler is notified when either save or delete
 		// is clicked
 		save.addClickListener(e -> h.onChange());
-//		deactivate.addClickListener(e -> h.onChange());
 	}
 
 }

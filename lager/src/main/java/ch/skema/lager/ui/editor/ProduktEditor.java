@@ -1,4 +1,4 @@
-package ch.skema.lager.ui;
+package ch.skema.lager.ui.editor;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
