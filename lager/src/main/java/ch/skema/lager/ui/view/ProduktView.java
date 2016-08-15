@@ -77,7 +77,7 @@ public class ProduktView extends VerticalLayout implements View {
 		filter.setInputPrompt("Nach Name filtern:");
 
 		// Replace listing with filtered content when user changes filter
-		filter.addTextChangeListener(e -> listCustomers(e.getText()));
+		filter.addTextChangeListener(e -> listData(e.getText()));
 
 		// Connect selected Customer to editor or hide if none is selected
 		grid.addSelectionListener(e -> {
@@ -94,22 +94,22 @@ public class ProduktView extends VerticalLayout implements View {
 		// Listen changes made by the editor, refresh data from backend
 		editor.setChangeHandler(() -> {
 			editor.setVisible(false);
-			listCustomers(filter.getValue());
+			listData(filter.getValue());
 		});
 
 		// Initialize listing
-		listCustomers(null);
+		listData(null);
 	}
 
-	private void listCustomers(String text) {
+	private void listData(String text) {
 		if (StringUtils.isEmpty(text)) {
-			grid.setContainerDataSource(createProduktBeanItemContainer(repo.findAll()));
+			grid.setContainerDataSource(createBeanItemContainer(repo.findAll()));
 		} else {
-			grid.setContainerDataSource(createProduktBeanItemContainer(repo.findByNameStartsWithIgnoreCase(text)));
+			grid.setContainerDataSource(createBeanItemContainer(repo.findByNameStartsWithIgnoreCase(text)));
 		}
 	}
 
-	private BeanItemContainer<Produkt> createProduktBeanItemContainer(List<Produkt> findAll) {
+	private BeanItemContainer<Produkt> createBeanItemContainer(List<Produkt> findAll) {
 		BeanItemContainer<Produkt> container = new BeanItemContainer<>(Produkt.class, findAll);
 		container.addNestedContainerProperty("kategorie.name");
 		return container;
