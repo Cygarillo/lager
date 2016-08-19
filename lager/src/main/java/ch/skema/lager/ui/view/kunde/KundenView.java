@@ -1,6 +1,4 @@
-package ch.skema.lager.ui.view;
-
-import java.util.List;
+package ch.skema.lager.ui.view.kunde;
 
 import javax.annotation.PostConstruct;
 
@@ -20,42 +18,29 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
-import ch.skema.lager.domain.Produkt;
-import ch.skema.lager.event.LagerEvent.ProduktEvent;
+import ch.skema.lager.domain.Kunde;
+import ch.skema.lager.event.LagerEvent;
 import ch.skema.lager.event.LagerEventBus;
-import ch.skema.lager.repository.ProduktRepository;
-import ch.skema.lager.ui.editor.ProduktEditor;
+import ch.skema.lager.repository.KundeRepository;
 
-@SpringView(name = ProduktView.VIEW_NAME)
+@SpringView(name = KundenView.VIEW_NAME)
 @UIScope
-public class ProduktView extends VerticalLayout implements View {
+public class KundenView extends VerticalLayout implements View {
 	private static final long serialVersionUID = 1L;
 	/*
 	 * This view is registered automatically based on the @SpringView
 	 * annotation. As it has an empty string as its view name, it will be shown
 	 * when navigating to the Homepage
 	 */
-	public static final String VIEW_NAME = "ProdukteView";
-	@Autowired
-	private ProduktRepository repo;
-	@Autowired
-	private ProduktEditor editor;
-	private Grid grid;
-	private TextField filter;
-	private Button addNewBtn;
+	public static final String VIEW_NAME = "customerView";
 
 	@PostConstruct
 	void init() {
 		this.grid = new Grid();
 		this.filter = new TextField();
-		this.addNewBtn = new Button("Neues Produkt", FontAwesome.PLUS);
+		this.addNewBtn = new Button("Neuer Kunde", FontAwesome.PLUS);
 		buildLayout();
 		LagerEventBus.register(this);
-	}
-
-	@Override
-	public void enter(ViewChangeEvent event) {
-		// the view is constructed in the init() method()
 	}
 
 	@Override
@@ -64,13 +49,24 @@ public class ProduktView extends VerticalLayout implements View {
 		LagerEventBus.unregister(this);
 	}
 
+	@Override
+	public void enter(ViewChangeEvent event) {
+		// the view is constructed in the init() method()
+	}
+
+	@Autowired
+	private KundeRepository repo;
+	@Autowired
+	private KundeEditor editor;
+	private Grid grid;
+	private TextField filter;
+	private Button addNewBtn;
+
 	private void buildLayout() {
 		HorizontalLayout toolbar = new HorizontalLayout(filter, addNewBtn);
 		toolbar.setSpacing(true);
-		grid.setColumns("name", "kategorie.name", "verkaufspreis", "einkaufspreisSl", "einkaufspreisBern", "abgaben", "aktiv");
-		grid.getColumn("kategorie.name").setHeaderCaption("Kategorie");
+		grid.setColumns("name");
 		grid.setSizeFull();
-
 		HorizontalLayout main = new HorizontalLayout(grid, editor);
 		main.setSpacing(true);
 		main.setSizeFull();
@@ -87,42 +83,36 @@ public class ProduktView extends VerticalLayout implements View {
 		filter.setInputPrompt("Nach Name filtern:");
 
 		// Replace listing with filtered content when user changes filter
-		filter.addTextChangeListener(e -> listData(e.getText()));
+		filter.addTextChangeListener(e -> listCustomers(e.getText()));
 
 		// Connect selected Customer to editor or hide if none is selected
 		grid.addSelectionListener(e -> {
 			if (e.getSelected().isEmpty()) {
 				editor.setVisible(false);
 			} else {
-				editor.editProdukt((Produkt) grid.getSelectedRow());
+				editor.editCustomer((Kunde) grid.getSelectedRow());
 			}
 		});
 
 		// Instantiate and edit new Customer the new button is clicked
-		addNewBtn.addClickListener(e -> editor.editProdukt(new Produkt("")));
+		addNewBtn.addClickListener(e -> editor.editCustomer(new Kunde("")));
 
 		// Initialize listing
-		listData(null);
+		listCustomers(null);
 	}
 
-	private void listData(String text) {
+	private void listCustomers(String text) {
 		if (StringUtils.isEmpty(text)) {
-			grid.setContainerDataSource(createBeanItemContainer(repo.findAll()));
+			grid.setContainerDataSource(new BeanItemContainer<>(Kunde.class, repo.findAll()));
 		} else {
-			grid.setContainerDataSource(createBeanItemContainer(repo.findByNameStartsWithIgnoreCase(text)));
+			grid.setContainerDataSource(new BeanItemContainer<>(Kunde.class, repo.findByNameStartsWithIgnoreCase(text)));
 		}
 	}
 
 	@Subscribe
-	public void processProduktEvent(final ProduktEvent event) {
+	public void processKundeEvent(final LagerEvent.KundeEvent event) {
 		editor.setVisible(false);
-		listData(filter.getValue());
-	}
-
-	private BeanItemContainer<Produkt> createBeanItemContainer(List<Produkt> findAll) {
-		BeanItemContainer<Produkt> container = new BeanItemContainer<>(Produkt.class, findAll);
-		container.addNestedContainerProperty("kategorie.name");
-		return container;
+		listCustomers(filter.getValue());
 	}
 
 }

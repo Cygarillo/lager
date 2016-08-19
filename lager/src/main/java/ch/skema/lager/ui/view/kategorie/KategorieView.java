@@ -1,4 +1,4 @@
-package ch.skema.lager.ui.view;
+package ch.skema.lager.ui.view.kategorie;
 
 import javax.annotation.PostConstruct;
 
@@ -22,7 +22,6 @@ import ch.skema.lager.domain.Kategorie;
 import ch.skema.lager.event.LagerEvent.KategorieEvent;
 import ch.skema.lager.event.LagerEventBus;
 import ch.skema.lager.repository.KategorieRepository;
-import ch.skema.lager.ui.editor.KategorieEditor;
 
 @SpringView(name = KategorieView.VIEW_NAME)
 @UIScope

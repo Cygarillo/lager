@@ -1,11 +1,12 @@
-package ch.skema.lager.ui.view;
+package ch.skema.lager.ui.view.bestellung;
+
+import java.util.Date;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 
-import com.google.common.eventbus.Subscribe;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -18,36 +19,34 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
-import ch.skema.lager.domain.Kunde;
-import ch.skema.lager.event.LagerEvent;
-import ch.skema.lager.event.LagerEventBus;
-import ch.skema.lager.repository.KundeRepository;
-import ch.skema.lager.ui.editor.KundeEditor;
+import ch.skema.lager.domain.Bestellung;
+import ch.skema.lager.repository.BestellungRepository;
 
-@SpringView(name = KundenView.VIEW_NAME)
+@SpringView(name = BestellungView.VIEW_NAME)
 @UIScope
-public class KundenView extends VerticalLayout implements View {
+public class BestellungView extends VerticalLayout implements View {
 	private static final long serialVersionUID = 1L;
 	/*
 	 * This view is registered automatically based on the @SpringView
 	 * annotation. As it has an empty string as its view name, it will be shown
 	 * when navigating to the Homepage
 	 */
-	public static final String VIEW_NAME = "customerView";
+	public static final String VIEW_NAME = "";
+	@Autowired
+	private BestellungRepository repo;
+	@Autowired
+	private BestellungEditor editor;
+	private TextField filter;
+	private Button addNewBtn;
+
+	private Grid grid;
 
 	@PostConstruct
 	void init() {
 		this.grid = new Grid();
+		this.addNewBtn = new Button("Neue Bestellung", FontAwesome.PLUS);
 		this.filter = new TextField();
-		this.addNewBtn = new Button("Neuer Kunde", FontAwesome.PLUS);
 		buildLayout();
-		LagerEventBus.register(this);
-	}
-
-	@Override
-	public void detach() {
-		super.detach();
-		LagerEventBus.unregister(this);
 	}
 
 	@Override
@@ -55,19 +54,13 @@ public class KundenView extends VerticalLayout implements View {
 		// the view is constructed in the init() method()
 	}
 
-	@Autowired
-	private KundeRepository repo;
-	@Autowired
-	private KundeEditor editor;
-	private Grid grid;
-	private TextField filter;
-	private Button addNewBtn;
-
 	private void buildLayout() {
 		HorizontalLayout toolbar = new HorizontalLayout(filter, addNewBtn);
 		toolbar.setSpacing(true);
-		grid.setColumns("name");
+		grid.setColumns("kunde.name", "erledigt");
+		grid.getColumn("kunde.name").setHeaderCaption("Kunde");
 		grid.setSizeFull();
+
 		HorizontalLayout main = new HorizontalLayout(grid, editor);
 		main.setSpacing(true);
 		main.setSizeFull();
@@ -84,36 +77,38 @@ public class KundenView extends VerticalLayout implements View {
 		filter.setInputPrompt("Nach Name filtern:");
 
 		// Replace listing with filtered content when user changes filter
-		filter.addTextChangeListener(e -> listCustomers(e.getText()));
+		filter.addTextChangeListener(e -> listData());
 
 		// Connect selected Customer to editor or hide if none is selected
 		grid.addSelectionListener(e -> {
 			if (e.getSelected().isEmpty()) {
 				editor.setVisible(false);
 			} else {
-				editor.editCustomer((Kunde) grid.getSelectedRow());
+				editor.edit((Bestellung) grid.getSelectedRow());
 			}
 		});
 
 		// Instantiate and edit new Customer the new button is clicked
-		addNewBtn.addClickListener(e -> editor.editCustomer(new Kunde("")));
+		addNewBtn.addClickListener(e -> editor.edit(new Bestellung(new Date())));
+
+		// Listen changes made by the editor, refresh data from backend
+		editor.setChangeHandler(() -> {
+			editor.setVisible(false);
+			listData();
+		});
 
 		// Initialize listing
-		listCustomers(null);
+		listData();
 	}
 
-	private void listCustomers(String text) {
-		if (StringUtils.isEmpty(text)) {
-			grid.setContainerDataSource(new BeanItemContainer<>(Kunde.class, repo.findAll()));
-		} else {
-			grid.setContainerDataSource(new BeanItemContainer<>(Kunde.class, repo.findByNameStartsWithIgnoreCase(text)));
-		}
+	private void listData() {
+		grid.setContainerDataSource(createBeanItemContainer(repo.findAll()));
 	}
 
-	@Subscribe
-	public void processKundeEvent(final LagerEvent.KundeEvent event) {
-		editor.setVisible(false);
-		listCustomers(filter.getValue());
+	private BeanItemContainer<Bestellung> createBeanItemContainer(List<Bestellung> findAll) {
+		BeanItemContainer<Bestellung> container = new BeanItemContainer<>(Bestellung.class, findAll);
+		container.addNestedContainerProperty("kunde.name");
+		return container;
 	}
 
 }

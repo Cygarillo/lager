@@ -15,10 +15,10 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 import ch.skema.lager.event.LagerEventBus;
-import ch.skema.lager.ui.view.BestellungView;
-import ch.skema.lager.ui.view.KategorieView;
-import ch.skema.lager.ui.view.KundenView;
-import ch.skema.lager.ui.view.ProduktView;
+import ch.skema.lager.ui.view.bestellung.BestellungView;
+import ch.skema.lager.ui.view.kategorie.KategorieView;
+import ch.skema.lager.ui.view.kunde.KundenView;
+import ch.skema.lager.ui.view.produkt.ProduktView;
 
 @SpringUI
 @Theme("valo")

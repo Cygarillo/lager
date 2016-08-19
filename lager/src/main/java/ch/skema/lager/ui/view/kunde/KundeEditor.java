@@ -1,6 +1,4 @@
-package ch.skema.lager.ui.editor;
-
-import javax.annotation.PostConstruct;
+package ch.skema.lager.ui.view.kunde;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -15,20 +13,22 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-import ch.skema.lager.domain.Kategorie;
+import ch.skema.lager.domain.Kunde;
 import ch.skema.lager.event.LagerEvent;
 import ch.skema.lager.event.LagerEventBus;
-import ch.skema.lager.repository.KategorieRepository;
+import ch.skema.lager.repository.KundeRepository;
 
 @SpringComponent
 @UIScope
-public class KategorieEditor extends VerticalLayout {
+public class KundeEditor extends VerticalLayout {
 	private static final long serialVersionUID = 1L;
 
-	@Autowired
-	private KategorieRepository repository;
+	private final KundeRepository repository;
 
-	private Kategorie kategorie;
+	/**
+	 * The currently edited customer
+	 */
+	private Kunde customer;
 
 	/* Fields to edit properties in Customer entity */
 	TextField name = new TextField("Name");
@@ -38,8 +38,10 @@ public class KategorieEditor extends VerticalLayout {
 	Button cancel = new Button("Abbrechen");
 	CssLayout actions = new CssLayout(save, cancel);
 
-	@PostConstruct
-	void init() {
+	@Autowired
+	public KundeEditor(KundeRepository repository) {
+		this.repository = repository;
+
 		addComponents(name, actions);
 
 		// Configure and style components
@@ -50,27 +52,32 @@ public class KategorieEditor extends VerticalLayout {
 
 		// wire action buttons to save, delete and reset
 		save.addClickListener(e -> {
-			repository.save(kategorie);
-			LagerEventBus.post(new LagerEvent.KategorieEvent());
+			repository.save(customer);
+			LagerEventBus.post(new LagerEvent.KundeEvent());
 		});
-		cancel.addClickListener(e -> edit(kategorie));
+		cancel.addClickListener(e -> editCustomer(customer));
 		setVisible(false);
 	}
 
-	public final void edit(Kategorie c) {
+	public interface ChangeHandler {
+
+		void onChange();
+	}
+
+	public final void editCustomer(Kunde c) {
 		final boolean persisted = c.getId() != null;
 		if (persisted) {
 			// Find fresh entity for editing
-			kategorie = repository.findOne(c.getId());
+			customer = repository.findOne(c.getId());
 		} else {
-			kategorie = c;
+			customer = c;
 		}
 		cancel.setVisible(persisted);
 
 		// Bind customer properties to similarly named fields
 		// Could also use annotation or "manual binding" or programmatically
 		// moving values from fields to entities before saving
-		BeanFieldGroup.bindFieldsUnbuffered(kategorie, this);
+		BeanFieldGroup.bindFieldsUnbuffered(customer, this);
 
 		setVisible(true);
 

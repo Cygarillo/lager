@@ -1,4 +1,4 @@
-package ch.skema.lager.ui.editor;
+package ch.skema.lager.ui.view.produkt;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
