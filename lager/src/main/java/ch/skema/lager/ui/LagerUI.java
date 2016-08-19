@@ -22,7 +22,7 @@ import ch.skema.lager.ui.view.ProduktView;
 
 @SpringUI
 @Theme("valo")
-public class VaadinUI extends UI {
+public class LagerUI extends UI {
 	private static final long serialVersionUID = 1L;
 
 	@Autowired
@@ -70,7 +70,7 @@ public class VaadinUI extends UI {
 	}
 
 	public static LagerEventBus getDashboardEventbus() {
-		return ((VaadinUI) getCurrent()).eventBus;
+		return ((LagerUI) getCurrent()).eventBus;
 	}
 
 }

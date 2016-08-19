@@ -4,7 +4,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.SubscriberExceptionContext;
 import com.google.common.eventbus.SubscriberExceptionHandler;
 
-import ch.skema.lager.ui.VaadinUI;
+import ch.skema.lager.ui.LagerUI;
 
 /**
  * A simple wrapper for Guava event bus. Defines static convenience methods for
@@ -15,15 +15,15 @@ public class LagerEventBus implements SubscriberExceptionHandler {
 	private final EventBus eventBus = new EventBus(this);
 
 	public static void post(final Object event) {
-		VaadinUI.getDashboardEventbus().eventBus.post(event);
+		LagerUI.getDashboardEventbus().eventBus.post(event);
 	}
 
 	public static void register(final Object object) {
-		VaadinUI.getDashboardEventbus().eventBus.register(object);
+		LagerUI.getDashboardEventbus().eventBus.register(object);
 	}
 
 	public static void unregister(final Object object) {
-		VaadinUI.getDashboardEventbus().eventBus.unregister(object);
+		LagerUI.getDashboardEventbus().eventBus.unregister(object);
 	}
 
 	@Override
