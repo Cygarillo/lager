@@ -14,6 +14,8 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 import ch.skema.lager.domain.Kunde;
+import ch.skema.lager.event.LagerEvent;
+import ch.skema.lager.event.LagerEventBus;
 import ch.skema.lager.repository.KundeRepository;
 
 @SpringComponent
@@ -49,7 +51,10 @@ public class KundeEditor extends VerticalLayout {
 		save.setClickShortcut(ShortcutAction.KeyCode.ENTER);
 
 		// wire action buttons to save, delete and reset
-		save.addClickListener(e -> repository.save(customer));
+		save.addClickListener(e -> {
+			repository.save(customer);
+			LagerEventBus.post(new LagerEvent.KundeEvent());
+		});
 		cancel.addClickListener(e -> editCustomer(customer));
 		setVisible(false);
 	}
@@ -80,13 +85,6 @@ public class KundeEditor extends VerticalLayout {
 		save.focus();
 		// Select all text in firstName field automatically
 		name.selectAll();
-	}
-
-	public void setChangeHandler(ChangeHandler h) {
-		// ChangeHandler is notified when either save or delete
-		// is clicked
-		save.addClickListener(e -> h.onChange());
-//		deactivate.addClickListener(e -> h.onChange());
 	}
 
 }

@@ -5,6 +5,7 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
+import com.google.common.eventbus.Subscribe;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -18,6 +19,8 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
 import ch.skema.lager.domain.Kunde;
+import ch.skema.lager.event.LagerEvent;
+import ch.skema.lager.event.LagerEventBus;
 import ch.skema.lager.repository.KundeRepository;
 import ch.skema.lager.ui.editor.KundeEditor;
 
@@ -37,7 +40,14 @@ public class KundenView extends VerticalLayout implements View {
 		this.grid = new Grid();
 		this.filter = new TextField();
 		this.addNewBtn = new Button("Neuer Kunde", FontAwesome.PLUS);
-		oldLayout();
+		buildLayout();
+		LagerEventBus.register(this);
+	}
+
+	@Override
+	public void detach() {
+		super.detach();
+		LagerEventBus.unregister(this);
 	}
 
 	@Override
@@ -53,7 +63,7 @@ public class KundenView extends VerticalLayout implements View {
 	private TextField filter;
 	private Button addNewBtn;
 
-	private void oldLayout() {
+	private void buildLayout() {
 		HorizontalLayout toolbar = new HorizontalLayout(filter, addNewBtn);
 		toolbar.setSpacing(true);
 		grid.setColumns("name");
@@ -88,13 +98,6 @@ public class KundenView extends VerticalLayout implements View {
 		// Instantiate and edit new Customer the new button is clicked
 		addNewBtn.addClickListener(e -> editor.editCustomer(new Kunde("")));
 
-		// Listen changes made by the editor, refresh data from backend
-		editor.setChangeHandler(() -> {
-			editor.setVisible(false);
-			editor.setSpacing(false);
-			listCustomers(filter.getValue());
-		});
-
 		// Initialize listing
 		listCustomers(null);
 	}
@@ -105,7 +108,12 @@ public class KundenView extends VerticalLayout implements View {
 		} else {
 			grid.setContainerDataSource(new BeanItemContainer<>(Kunde.class, repo.findByNameStartsWithIgnoreCase(text)));
 		}
+	}
 
+	@Subscribe
+	public void processKundeEvent(final LagerEvent.KundeEvent event) {
+		editor.setVisible(false);
+		listCustomers(filter.getValue());
 	}
 
 }

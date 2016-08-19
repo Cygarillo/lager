@@ -57,11 +57,6 @@ public class KategorieEditor extends VerticalLayout {
 		setVisible(false);
 	}
 
-	public interface ChangeHandler {
-
-		void onChange();
-	}
-
 	public final void edit(Kategorie c) {
 		final boolean persisted = c.getId() != null;
 		if (persisted) {
@@ -83,12 +78,6 @@ public class KategorieEditor extends VerticalLayout {
 		save.focus();
 		// Select all text in firstName field automatically
 		name.selectAll();
-	}
-
-	public void setChangeHandler(ChangeHandler h) {
-		// ChangeHandler is notified when either save or delete
-		// is clicked
-		save.addClickListener(e -> h.onChange());
 	}
 
 }

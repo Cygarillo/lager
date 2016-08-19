@@ -7,6 +7,7 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
+import com.google.common.eventbus.Subscribe;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -20,6 +21,8 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
 import ch.skema.lager.domain.Produkt;
+import ch.skema.lager.event.LagerEvent.ProduktEvent;
+import ch.skema.lager.event.LagerEventBus;
 import ch.skema.lager.repository.ProduktRepository;
 import ch.skema.lager.ui.editor.ProduktEditor;
 
@@ -47,11 +50,18 @@ public class ProduktView extends VerticalLayout implements View {
 		this.filter = new TextField();
 		this.addNewBtn = new Button("Neues Produkt", FontAwesome.PLUS);
 		buildLayout();
+		LagerEventBus.register(this);
 	}
 
 	@Override
 	public void enter(ViewChangeEvent event) {
 		// the view is constructed in the init() method()
+	}
+
+	@Override
+	public void detach() {
+		super.detach();
+		LagerEventBus.unregister(this);
 	}
 
 	private void buildLayout() {
@@ -91,12 +101,6 @@ public class ProduktView extends VerticalLayout implements View {
 		// Instantiate and edit new Customer the new button is clicked
 		addNewBtn.addClickListener(e -> editor.editProdukt(new Produkt("")));
 
-		// Listen changes made by the editor, refresh data from backend
-		editor.setChangeHandler(() -> {
-			editor.setVisible(false);
-			listData(filter.getValue());
-		});
-
 		// Initialize listing
 		listData(null);
 	}
@@ -107,6 +111,12 @@ public class ProduktView extends VerticalLayout implements View {
 		} else {
 			grid.setContainerDataSource(createBeanItemContainer(repo.findByNameStartsWithIgnoreCase(text)));
 		}
+	}
+
+	@Subscribe
+	public void processProduktEvent(final ProduktEvent event) {
+		editor.setVisible(false);
+		listData(filter.getValue());
 	}
 
 	private BeanItemContainer<Produkt> createBeanItemContainer(List<Produkt> findAll) {

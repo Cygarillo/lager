@@ -78,7 +78,10 @@ public class ProduktEditor extends VerticalLayout {
 		save.setClickShortcut(ShortcutAction.KeyCode.ENTER);
 
 		// wire action buttons to save, delete and reset
-		save.addClickListener(e -> repository.save(product));
+		save.addClickListener(e -> {
+			repository.save(product);
+			LagerEventBus.post(new LagerEvent.ProduktEvent());
+		});
 		cancel.addClickListener(e -> editProdukt(product));
 		setVisible(false);
 		LagerEventBus.register(this);
@@ -93,10 +96,6 @@ public class ProduktEditor extends VerticalLayout {
 		BeanItemContainer<Kategorie> container = new BeanItemContainer<>(Kategorie.class, kategorieRepository.findAll());
 		kategorie.setContainerDataSource(container);
 		kategorie.select(container.firstItemId());
-	}
-
-	public interface ChangeHandler {
-		void onChange();
 	}
 
 	public final void editProdukt(Produkt c) {
@@ -121,13 +120,6 @@ public class ProduktEditor extends VerticalLayout {
 		save.focus();
 		// Select all text in firstName field automatically
 		name.selectAll();
-	}
-
-	public void setChangeHandler(ChangeHandler h) {
-		// ChangeHandler is notified when either save or delete
-		// is clicked
-		save.addClickListener(e -> h.onChange());
-//		deactivate.addClickListener(e -> h.onChange());
 	}
 
 	@Subscribe
