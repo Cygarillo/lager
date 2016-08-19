@@ -8,30 +8,28 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 import ch.skema.lager.domain.Bestellung;
-import ch.skema.lager.event.EventSystem;
-import ch.skema.lager.event.KategorieEvent;
-import ch.skema.lager.event.KategorieEvent.KategorieEventListener;
 import ch.skema.lager.repository.BestellungRepository;
 
 @SpringComponent
 @UIScope
-public class BestellungEditor extends VerticalLayout implements KategorieEventListener {
+public class BestellungEditor extends VerticalLayout {
 	private static final long serialVersionUID = 1L;
 
 	@Autowired
 	private BestellungRepository repository;
-	@Autowired
-	private EventSystem eventSystem;
 
 	/**
 	 * The currently edited entity
 	 */
 	private Bestellung bestellung;
+
+	private ComboBox kunde = new ComboBox("Wähle Kunde");
 
 	/* Action buttons */
 	private Button save = new Button("Speichern", FontAwesome.SAVE);
@@ -44,26 +42,30 @@ public class BestellungEditor extends VerticalLayout implements KategorieEventLi
 		actions.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
 		save.setStyleName(ValoTheme.BUTTON_PRIMARY);
 		save.setClickShortcut(ShortcutAction.KeyCode.ENTER);
+
+		addComponents(kunde, actions);
+
+		setVisible(false);
 	}
 
 	public interface ChangeHandler {
 		void onChange();
 	}
 
-	public final void edit(Bestellung c) {
-		final boolean persisted = c.getId() != null;
+	public final void edit(Bestellung bestellung) {
+		final boolean persisted = bestellung.getId() != null;
 		if (persisted) {
 			// Find fresh entity for editing
-			bestellung = repository.findOne(c.getId());
+			this.bestellung = repository.findOne(bestellung.getId());
 		} else {
-			bestellung = c;
+			this.bestellung = bestellung;
 		}
 		cancel.setVisible(persisted);
 
 		// Bind customer properties to similarly named fields
 		// Could also use annotation or "manual binding" or programmatically
 		// moving values from fields to entities before saving
-		BeanFieldGroup.bindFieldsUnbuffered(bestellung, this);
+		BeanFieldGroup.bindFieldsUnbuffered(this.bestellung, this);
 		setVisible(true);
 
 		// A hack to ensure the whole form is visible
@@ -77,10 +79,6 @@ public class BestellungEditor extends VerticalLayout implements KategorieEventLi
 		// is clicked
 		save.addClickListener(e -> h.onChange());
 //		deactivate.addClickListener(e -> h.onChange());
-	}
-
-	@Override
-	public void reloadEntries(KategorieEvent event) {
 	}
 
 }

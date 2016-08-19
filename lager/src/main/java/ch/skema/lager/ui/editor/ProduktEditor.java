@@ -1,7 +1,11 @@
 package ch.skema.lager.ui.editor;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.google.common.eventbus.Subscribe;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ShortcutAction;
@@ -18,19 +22,19 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import ch.skema.lager.domain.Kategorie;
 import ch.skema.lager.domain.Produkt;
-import ch.skema.lager.event.EventSystem;
-import ch.skema.lager.event.KategorieEvent;
-import ch.skema.lager.event.KategorieEvent.KategorieEventListener;
+import ch.skema.lager.event.LagerEvent;
+import ch.skema.lager.event.LagerEventBus;
 import ch.skema.lager.repository.KategorieRepository;
 import ch.skema.lager.repository.ProduktRepository;
 
 @SpringComponent
 @UIScope
-public class ProduktEditor extends VerticalLayout implements KategorieEventListener {
+public class ProduktEditor extends VerticalLayout {
 	private static final long serialVersionUID = 1L;
-
-	private final ProduktRepository repository;
-	private final KategorieRepository kategorieRepository;
+	@Autowired
+	private ProduktRepository repository;
+	@Autowired
+	private KategorieRepository kategorieRepository;
 
 	/**
 	 * The currently edited customer
@@ -39,7 +43,6 @@ public class ProduktEditor extends VerticalLayout implements KategorieEventListe
 
 	/* Fields to edit properties in Product entity */
 	TextField name = new TextField("Produktname");
-
 	TextField verkaufspreis = new TextField("Verkaufspreis an Schüler");
 	TextField einkaufspreisSl = new TextField("Einkaufspreis Schulleiter");
 	TextField einkaufspreisBern = new TextField("Einkaufspreis Bern");
@@ -47,20 +50,13 @@ public class ProduktEditor extends VerticalLayout implements KategorieEventListe
 	CheckBox aktiv = new CheckBox("Aktiv");
 	ComboBox kategorie = new ComboBox("Wähle Kategorie");
 
-	EventSystem eventSystem;
-
-	// TextField aktiv = new TextField("Produktname");;
-
 	/* Action buttons */
 	Button save = new Button("Speichern", FontAwesome.SAVE);
 	Button cancel = new Button("Abbrechen");
 	CssLayout actions = new CssLayout(save, cancel);
 
-	@Autowired
-	public ProduktEditor(ProduktRepository repository, KategorieRepository katRepo, EventSystem eventSystem) {
-		this.repository = repository;
-		this.kategorieRepository = katRepo;
-		this.eventSystem = eventSystem;
+	@PostConstruct
+	public void init() {
 		verkaufspreis.setNullRepresentation("");
 		einkaufspreisSl.setNullRepresentation("");
 		einkaufspreisBern.setNullRepresentation("");
@@ -85,12 +81,15 @@ public class ProduktEditor extends VerticalLayout implements KategorieEventListe
 		save.addClickListener(e -> repository.save(product));
 		cancel.addClickListener(e -> editProdukt(product));
 		setVisible(false);
-
-		eventSystem.addListener(this);
-
+		LagerEventBus.register(this);
 	}
 
-	private void reloadKategories() {
+	@PreDestroy
+	public void destroy() {
+		LagerEventBus.unregister(this);
+	}
+
+	public void reloadKategories() {
 		BeanItemContainer<Kategorie> container = new BeanItemContainer<>(Kategorie.class, kategorieRepository.findAll());
 		kategorie.setContainerDataSource(container);
 		kategorie.select(container.firstItemId());
@@ -107,7 +106,8 @@ public class ProduktEditor extends VerticalLayout implements KategorieEventListe
 			product = repository.findOne(c.getId());
 		} else {
 			product = c;
-			product.setKategorie((Kategorie) kategorie.getConvertedValue());//default kategorie
+			product.setKategorie((Kategorie) kategorie.getConvertedValue());// default
+																			// kategorie
 		}
 		cancel.setVisible(persisted);
 
@@ -130,9 +130,8 @@ public class ProduktEditor extends VerticalLayout implements KategorieEventListe
 //		deactivate.addClickListener(e -> h.onChange());
 	}
 
-	@Override
-	public void reloadEntries(KategorieEvent event) {
+	@Subscribe
+	public void reloadKategories(final LagerEvent.KategorieEvent event) {
 		reloadKategories();
 	}
-
 }

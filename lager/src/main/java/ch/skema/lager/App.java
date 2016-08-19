@@ -18,7 +18,7 @@ public class App {
 
 	public static void main(String[] args) {
 		SpringApplication.run(App.class);
-		new BrowserLauncher().launch();
+//		new BrowserLauncher().launch();
 	}
 
 	@Bean

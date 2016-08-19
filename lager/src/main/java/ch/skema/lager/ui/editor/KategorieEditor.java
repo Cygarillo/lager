@@ -1,5 +1,7 @@
 package ch.skema.lager.ui.editor;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
@@ -14,8 +16,8 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 import ch.skema.lager.domain.Kategorie;
-import ch.skema.lager.event.EventSystem;
-import ch.skema.lager.event.KategorieEvent;
+import ch.skema.lager.event.LagerEvent;
+import ch.skema.lager.event.LagerEventBus;
 import ch.skema.lager.repository.KategorieRepository;
 
 @SpringComponent
@@ -23,11 +25,10 @@ import ch.skema.lager.repository.KategorieRepository;
 public class KategorieEditor extends VerticalLayout {
 	private static final long serialVersionUID = 1L;
 
-	private final KategorieRepository repository;
+	@Autowired
+	private KategorieRepository repository;
 
 	private Kategorie kategorie;
-	@Autowired
-	EventSystem eventSystem;
 
 	/* Fields to edit properties in Customer entity */
 	TextField name = new TextField("Name");
@@ -37,10 +38,8 @@ public class KategorieEditor extends VerticalLayout {
 	Button cancel = new Button("Abbrechen");
 	CssLayout actions = new CssLayout(save, cancel);
 
-	@Autowired
-	public KategorieEditor(KategorieRepository repository) {
-		this.repository = repository;
-
+	@PostConstruct
+	void init() {
 		addComponents(name, actions);
 
 		// Configure and style components
@@ -52,7 +51,7 @@ public class KategorieEditor extends VerticalLayout {
 		// wire action buttons to save, delete and reset
 		save.addClickListener(e -> {
 			repository.save(kategorie);
-			eventSystem.fire(new KategorieEvent());
+			LagerEventBus.post(new LagerEvent.KategorieEvent());
 		});
 		cancel.addClickListener(e -> edit(kategorie));
 		setVisible(false);

@@ -14,9 +14,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-import ch.skema.lager.event.EventSystem;
-import ch.skema.lager.event.KategorieEvent;
-import ch.skema.lager.event.KategorieEvent.KategorieEventListener;
+import ch.skema.lager.event.LagerEventBus;
 import ch.skema.lager.ui.view.BestellungView;
 import ch.skema.lager.ui.view.KategorieView;
 import ch.skema.lager.ui.view.KundenView;
@@ -29,15 +27,12 @@ public class VaadinUI extends UI {
 
 	@Autowired
 	private SpringViewProvider viewProvider;
-
-	@Autowired
-	EventSystem eventSystem;
+	private final LagerEventBus eventBus = new LagerEventBus();
 
 	@Override
+
 	protected void init(VaadinRequest request) {
 		newLayout();
-
-		registerEvents();
 	}
 
 	private void newLayout() {
@@ -74,8 +69,8 @@ public class VaadinUI extends UI {
 		return button;
 	}
 
-	private void registerEvents() {
-		eventSystem.registerEvent(KategorieEventListener.class, KategorieEvent.class);
+	public static LagerEventBus getDashboardEventbus() {
+		return ((VaadinUI) getCurrent()).eventBus;
 	}
 
 }
