@@ -7,6 +7,7 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.google.common.eventbus.Subscribe;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -20,6 +21,8 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
 import ch.skema.lager.domain.Bestellung;
+import ch.skema.lager.event.LagerEvent.BestellungEvent;
+import ch.skema.lager.event.LagerEventBus;
 import ch.skema.lager.repository.BestellungRepository;
 
 @SpringView(name = BestellungView.VIEW_NAME)
@@ -47,6 +50,13 @@ public class BestellungView extends VerticalLayout implements View {
 		this.addNewBtn = new Button("Neue Bestellung", FontAwesome.PLUS);
 		this.filter = new TextField();
 		buildLayout();
+		LagerEventBus.register(this);
+	}
+
+	@Override
+	public void detach() {
+		super.detach();
+		LagerEventBus.unregister(this);
 	}
 
 	@Override
@@ -91,12 +101,6 @@ public class BestellungView extends VerticalLayout implements View {
 		// Instantiate and edit new Customer the new button is clicked
 		addNewBtn.addClickListener(e -> editor.edit(new Bestellung(new Date())));
 
-		// Listen changes made by the editor, refresh data from backend
-		editor.setChangeHandler(() -> {
-			editor.setVisible(false);
-			listData();
-		});
-
 		// Initialize listing
 		listData();
 	}
@@ -109,6 +113,12 @@ public class BestellungView extends VerticalLayout implements View {
 		BeanItemContainer<Bestellung> container = new BeanItemContainer<>(Bestellung.class, findAll);
 		container.addNestedContainerProperty("kunde.name");
 		return container;
+	}
+
+	@Subscribe
+	public void processBestllungEvent(final BestellungEvent event) {
+		editor.setVisible(false);
+		listData();
 	}
 
 }

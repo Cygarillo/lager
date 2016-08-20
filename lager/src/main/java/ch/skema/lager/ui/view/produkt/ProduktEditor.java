@@ -65,7 +65,7 @@ public class ProduktEditor extends VerticalLayout {
 		kategorie.setInvalidAllowed(false);
 		kategorie.setNullSelectionAllowed(false);
 
-		reloadKategories();
+		loadKategories();
 
 		kategorie.setItemCaptionPropertyId("name");
 
@@ -92,7 +92,7 @@ public class ProduktEditor extends VerticalLayout {
 		LagerEventBus.unregister(this);
 	}
 
-	public void reloadKategories() {
+	public void loadKategories() {
 		BeanItemContainer<Kategorie> container = new BeanItemContainer<>(Kategorie.class, kategorieRepository.findAll());
 		kategorie.setContainerDataSource(container);
 		kategorie.select(container.firstItemId());
@@ -124,6 +124,6 @@ public class ProduktEditor extends VerticalLayout {
 
 	@Subscribe
 	public void reloadKategories(final LagerEvent.KategorieEvent event) {
-		reloadKategories();
+		loadKategories();
 	}
 }

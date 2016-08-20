@@ -1,5 +1,7 @@
 package ch.skema.lager.ui.view.kunde;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
@@ -22,8 +24,8 @@ import ch.skema.lager.repository.KundeRepository;
 @UIScope
 public class KundeEditor extends VerticalLayout {
 	private static final long serialVersionUID = 1L;
-
-	private final KundeRepository repository;
+	@Autowired
+	private KundeRepository repository;
 
 	/**
 	 * The currently edited customer
@@ -38,10 +40,8 @@ public class KundeEditor extends VerticalLayout {
 	Button cancel = new Button("Abbrechen");
 	CssLayout actions = new CssLayout(save, cancel);
 
-	@Autowired
-	public KundeEditor(KundeRepository repository) {
-		this.repository = repository;
-
+	@PostConstruct
+	public void init() {
 		addComponents(name, actions);
 
 		// Configure and style components
@@ -57,11 +57,6 @@ public class KundeEditor extends VerticalLayout {
 		});
 		cancel.addClickListener(e -> editCustomer(customer));
 		setVisible(false);
-	}
-
-	public interface ChangeHandler {
-
-		void onChange();
 	}
 
 	public final void editCustomer(Kunde c) {

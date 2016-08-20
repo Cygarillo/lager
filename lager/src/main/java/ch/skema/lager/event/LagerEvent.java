@@ -11,4 +11,7 @@ public abstract class LagerEvent {
 	public static class KundeEvent {
 	}
 
+	public static class BestellungEvent {
+	}
+
 }
