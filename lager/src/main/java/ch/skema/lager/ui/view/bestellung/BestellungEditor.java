@@ -55,9 +55,12 @@ public class BestellungEditor extends VerticalLayout {
 		save.setStyleName(ValoTheme.BUTTON_PRIMARY);
 		save.setClickShortcut(ShortcutAction.KeyCode.ENTER);
 		save.addClickListener(e -> {
+			bestellRepo.save(bestellung);
 			LagerEventBus.post(new BestellungEvent());
 		});
 		addComponents(kunde, actions);
+		kunde.setItemCaptionPropertyId("name");
+		kunde.setNullSelectionAllowed(false);
 
 		loadKunden();
 
