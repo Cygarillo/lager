@@ -10,6 +10,7 @@ import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.Button;
@@ -64,6 +65,7 @@ public class ProduktEditor extends VerticalLayout {
 
 		kategorie.setInvalidAllowed(false);
 		kategorie.setNullSelectionAllowed(false);
+		kategorie.setFilteringMode(FilteringMode.CONTAINS);
 
 		loadKategories();
 
@@ -79,12 +81,18 @@ public class ProduktEditor extends VerticalLayout {
 
 		// wire action buttons to save, delete and reset
 		save.addClickListener(e -> {
-			repository.save(product);
-			LagerEventBus.post(new LagerEvent.ProduktEvent());
+			if (isValid()) {
+				repository.save(product);
+				LagerEventBus.post(new LagerEvent.ProduktEvent());
+			}
 		});
 		cancel.addClickListener(e -> editProdukt(product));
 		setVisible(false);
 		LagerEventBus.register(this);
+	}
+
+	private boolean isValid() {
+		return kategorie.isValid();
 	}
 
 	@PreDestroy

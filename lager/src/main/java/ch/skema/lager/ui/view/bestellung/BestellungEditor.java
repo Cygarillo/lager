@@ -10,6 +10,7 @@ import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.Button;
@@ -55,17 +56,23 @@ public class BestellungEditor extends VerticalLayout {
 		save.setStyleName(ValoTheme.BUTTON_PRIMARY);
 		save.setClickShortcut(ShortcutAction.KeyCode.ENTER);
 		save.addClickListener(e -> {
-			bestellRepo.save(bestellung);
-			LagerEventBus.post(new BestellungEvent());
+			if (isValid()) {
+				bestellRepo.save(bestellung);
+				LagerEventBus.post(new BestellungEvent());
+			}
 		});
 		addComponents(kunde, actions);
 		kunde.setItemCaptionPropertyId("name");
 		kunde.setNullSelectionAllowed(false);
-
+		kunde.setFilteringMode(FilteringMode.CONTAINS);
 		loadKunden();
 
 		setVisible(false);
 		LagerEventBus.register(this);
+	}
+
+	private boolean isValid() {
+		return kunde.isValid();
 	}
 
 	private void loadKunden() {
@@ -86,6 +93,7 @@ public class BestellungEditor extends VerticalLayout {
 			this.bestellung = bestellRepo.findOne(bestellung.getId());
 		} else {
 			this.bestellung = bestellung;
+			this.bestellung.setKunde((Kunde) kunde.getConvertedValue());
 		}
 		cancel.setVisible(persisted);
 
