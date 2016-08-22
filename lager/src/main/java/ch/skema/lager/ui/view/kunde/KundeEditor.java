@@ -42,6 +42,7 @@ public class KundeEditor extends VerticalLayout {
 
 	@PostConstruct
 	public void init() {
+		name.setSizeFull();
 		addComponents(name, actions);
 
 		// Configure and style components

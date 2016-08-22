@@ -70,6 +70,7 @@ public class BestellungEditor extends VerticalLayout {
 		kunde.setItemCaptionPropertyId("name");
 		kunde.setNullSelectionAllowed(false);
 		kunde.setFilteringMode(FilteringMode.CONTAINS);
+		kunde.setSizeFull();
 		loadKunden();
 
 		// bestellposition
@@ -77,6 +78,9 @@ public class BestellungEditor extends VerticalLayout {
 		bestellpositionGrid.setSizeFull();
 
 		addComponents(kunde, bestellpositionGrid, actions);
+		forEach(e -> {
+			e.setSizeFull();
+		});
 		setVisible(false);
 		LagerEventBus.register(this);
 	}

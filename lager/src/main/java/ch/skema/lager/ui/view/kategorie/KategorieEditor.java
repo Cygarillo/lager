@@ -40,6 +40,7 @@ public class KategorieEditor extends VerticalLayout {
 
 	@PostConstruct
 	void init() {
+		name.setSizeFull();
 		addComponents(name, actions);
 
 		// Configure and style components

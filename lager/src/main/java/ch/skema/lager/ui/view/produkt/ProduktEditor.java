@@ -89,6 +89,11 @@ public class ProduktEditor extends VerticalLayout {
 		cancel.addClickListener(e -> editProdukt(product));
 		setVisible(false);
 		LagerEventBus.register(this);
+
+		forEach(e -> {
+			e.setSizeFull();
+		});
+
 	}
 
 	private boolean isValid() {
