@@ -35,7 +35,7 @@ public class KundenView extends VerticalLayout implements View {
 	public static final String VIEW_NAME = "customerView";
 
 	@PostConstruct
-	void init() {
+	public void init() {
 		this.grid = new Grid();
 		this.filter = new TextField();
 		this.addNewBtn = new Button("Neuer Kunde", FontAwesome.PLUS);

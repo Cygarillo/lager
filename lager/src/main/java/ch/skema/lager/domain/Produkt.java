@@ -1,16 +1,22 @@
 package ch.skema.lager.domain;
 
 import java.math.BigDecimal;
+import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Produkt {
 	@Id
 	@GeneratedValue
+	@Column(name = "produkt_id")
 	private Long id;
 	private String name;
 	private BigDecimal verkaufspreis;
@@ -19,8 +25,12 @@ public class Produkt {
 	private BigDecimal abgaben;
 	private boolean aktiv = true;
 
-	@ManyToOne(targetEntity = Kategorie.class)
+	@ManyToOne
+	@JoinColumn(name = "kategorie_id")
 	private Kategorie kategorie;
+
+	@OneToMany(mappedBy = "produkt", fetch = FetchType.EAGER)
+	private List<BestellPosition> bestellPosition;
 
 	public boolean isAktiv() {
 		return aktiv;

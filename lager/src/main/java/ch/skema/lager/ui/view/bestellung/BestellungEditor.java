@@ -1,5 +1,7 @@
 package ch.skema.lager.ui.view.bestellung;
 
+import java.util.List;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
@@ -16,9 +18,11 @@ import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.Grid;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+import ch.skema.lager.domain.BestellPosition;
 import ch.skema.lager.domain.Bestellung;
 import ch.skema.lager.domain.Kunde;
 import ch.skema.lager.event.LagerEvent.BestellungEvent;
@@ -47,6 +51,7 @@ public class BestellungEditor extends VerticalLayout {
 	private Button save = new Button("Speichern", FontAwesome.SAVE);
 	private Button cancel = new Button("Abbrechen");
 	private CssLayout actions = new CssLayout(save, cancel);
+	private Grid bestellpositionGrid = new Grid();
 
 	@PostConstruct
 	public void init() {
@@ -61,14 +66,26 @@ public class BestellungEditor extends VerticalLayout {
 				LagerEventBus.post(new BestellungEvent());
 			}
 		});
-		addComponents(kunde, actions);
+		// kunde
 		kunde.setItemCaptionPropertyId("name");
 		kunde.setNullSelectionAllowed(false);
 		kunde.setFilteringMode(FilteringMode.CONTAINS);
 		loadKunden();
 
+		// bestellposition
+		bestellpositionGrid.setColumns("produkt.name", "anzahl");
+		bestellpositionGrid.setSizeFull();
+
+		addComponents(kunde, bestellpositionGrid, actions);
 		setVisible(false);
 		LagerEventBus.register(this);
+	}
+
+	private void loadBestellposition() {
+		List<BestellPosition> bestellPosition = bestellung.getBestellPosition();
+		BeanItemContainer<BestellPosition> container = new BeanItemContainer<>(BestellPosition.class, bestellPosition);
+		container.addNestedContainerProperty("produkt.name");
+		bestellpositionGrid.setContainerDataSource(container);
 	}
 
 	private boolean isValid() {
@@ -95,6 +112,7 @@ public class BestellungEditor extends VerticalLayout {
 			this.bestellung = bestellung;
 			this.bestellung.setKunde((Kunde) kunde.getConvertedValue());
 		}
+		loadBestellposition();
 		cancel.setVisible(persisted);
 
 		// Bind customer properties to similarly named fields
