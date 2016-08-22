@@ -36,4 +36,12 @@ public class Kategorie {
 	public String toString() {
 		return String.format("Kategorie[id=%d, name='%s']", id, name);
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Kategorie) {
+			return ((Kategorie) obj).getId().equals(id);
+		}
+		return super.equals(obj);
+	}
 }

@@ -106,7 +106,7 @@ public class ProduktEditor extends VerticalLayout {
 	public void loadKategories() {
 		BeanItemContainer<Kategorie> container = new BeanItemContainer<>(Kategorie.class, kategorieRepository.findAll());
 		kategorie.setContainerDataSource(container);
-		kategorie.select(container.firstItemId());
+//		kategorie.select(container.firstItemId());
 	}
 
 	public final void editProdukt(Produkt c) {

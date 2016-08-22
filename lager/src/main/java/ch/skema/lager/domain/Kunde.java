@@ -36,4 +36,12 @@ public class Kunde {
 	public String toString() {
 		return String.format("Customer[id=%d, name='%s']", id, name);
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Kunde) {
+			return ((Kunde) obj).getId().equals(id);
+		}
+		return super.equals(obj);
+	}
 }
