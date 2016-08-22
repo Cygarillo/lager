@@ -66,10 +66,8 @@ public class ProduktEditor extends VerticalLayout {
 		kategorie.setInvalidAllowed(false);
 		kategorie.setNullSelectionAllowed(false);
 		kategorie.setFilteringMode(FilteringMode.CONTAINS);
-
-		loadKategories();
-
 		kategorie.setItemCaptionPropertyId("name");
+		loadKategories();
 
 		addComponents(name, kategorie, verkaufspreis, einkaufspreisSl, einkaufspreisBern, abgaben, aktiv, actions);
 
@@ -131,6 +129,7 @@ public class ProduktEditor extends VerticalLayout {
 
 		// A hack to ensure the whole form is visible
 		save.focus();
+		kategorie.setImmediate(true);
 		// Select all text in firstName field automatically
 		name.selectAll();
 	}
@@ -138,5 +137,9 @@ public class ProduktEditor extends VerticalLayout {
 	@Subscribe
 	public void reloadKategories(final LagerEvent.KategorieEvent event) {
 		loadKategories();
+	}
+
+	public Produkt getProduct() {
+		return product;
 	}
 }

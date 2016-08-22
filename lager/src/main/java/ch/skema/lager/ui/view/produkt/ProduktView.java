@@ -102,14 +102,25 @@ public class ProduktView extends VerticalLayout implements View {
 
 		// Initialize listing
 		listData(null);
+
 	}
 
 	private void listData(String text) {
-		if (StringUtils.isEmpty(text)) {
-			grid.setContainerDataSource(createBeanItemContainer(repo.findAll()));
-		} else {
-			grid.setContainerDataSource(createBeanItemContainer(repo.findByNameStartsWithIgnoreCase(text)));
+		boolean restoreSelection = false;
+		if (editor.isVisible() && editor.getProduct() != null) {
+			restoreSelection = true;
 		}
+		if (StringUtils.isEmpty(text)) {
+			BeanItemContainer<Produkt> container = createBeanItemContainer(repo.findAll());
+			grid.setContainerDataSource(container);
+			if (restoreSelection) {
+				grid.select(container.getItemIds().stream().filter(i -> i.getId().equals(editor.getProduct().getId())).findFirst().get());
+			}
+		} else {
+			BeanItemContainer<Produkt> container = createBeanItemContainer(repo.findByNameStartsWithIgnoreCase(text));
+			grid.setContainerDataSource(container);
+		}
+
 	}
 
 	@Subscribe

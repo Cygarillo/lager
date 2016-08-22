@@ -101,6 +101,6 @@ public class Produkt {
 
 	@Override
 	public String toString() {
-		return String.format("Kategorie[id=%d, name='%s', verkaufspreis='%d', einkaufspreisSl='%d', einkaufspreisBern='%d', abgaben='%d']", id, name, verkaufspreis, einkaufspreisSl, einkaufspreisBern, abgaben);
+		return String.format("Kategorie[id=%d, name='%s']", id, name);
 	}
 }
