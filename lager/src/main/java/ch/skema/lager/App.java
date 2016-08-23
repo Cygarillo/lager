@@ -38,7 +38,8 @@ public class App {
 			repository.save(new Kunde("Chloe O'Brian"));
 			Kunde kunde = new Kunde("Kim Bauer");
 			repository.save(kunde);
-			repository.save(new Kunde("David Palmer"));
+			Kunde kunde2 = new Kunde("David Palmer");
+			repository.save(kunde2);
 			repository.save(new Kunde("Michelle Dessler"));
 
 			Kategorie salzKategorie = new Kategorie("Salz");
@@ -58,6 +59,10 @@ public class App {
 			Bestellung bestellung = new Bestellung(new Date());
 			bestellung.setKunde(kunde);
 			bestellRepo.save(bestellung);
+			Bestellung bestellung2 = new Bestellung(new Date());
+			bestellung2.setKunde(kunde2);
+			bestellung2.setErledigt(true);
+			bestellRepo.save(bestellung2);
 
 			BestellPosition position = new BestellPosition();
 			position.setAnzahl(42L);

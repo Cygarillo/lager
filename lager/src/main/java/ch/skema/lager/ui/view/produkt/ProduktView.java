@@ -19,11 +19,13 @@ import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.renderers.HtmlRenderer;
 
 import ch.skema.lager.domain.Produkt;
 import ch.skema.lager.event.LagerEvent.ProduktEvent;
 import ch.skema.lager.event.LagerEventBus;
 import ch.skema.lager.repository.ProduktRepository;
+import ch.skema.lager.ui.converter.IconStringToBooleanConverter;
 
 @SpringView(name = ProduktView.VIEW_NAME)
 @UIScope
@@ -66,7 +68,8 @@ public class ProduktView extends VerticalLayout implements View {
 	private void buildLayout() {
 		HorizontalLayout toolbar = new HorizontalLayout(filter, addNewBtn);
 		toolbar.setSpacing(true);
-		grid.setColumns("name", "kategorie.name", "verkaufspreis", "einkaufspreisSl", "einkaufspreisBern", "abgaben", "aktiv");
+		grid.setColumns("name", "kategorie.name", "verkaufspreis", "einkaufspreisSl", "einkaufspreisBern", "abgaben");
+		grid.addColumn("aktiv", Boolean.class).setRenderer(new HtmlRenderer(), new IconStringToBooleanConverter());
 		grid.getColumn("kategorie.name").setHeaderCaption("Kategorie");
 		grid.setSizeFull();
 

@@ -19,11 +19,13 @@ import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.renderers.HtmlRenderer;
 
 import ch.skema.lager.domain.Bestellung;
 import ch.skema.lager.event.LagerEvent.BestellungEvent;
 import ch.skema.lager.event.LagerEventBus;
 import ch.skema.lager.repository.BestellungRepository;
+import ch.skema.lager.ui.converter.IconStringToBooleanConverter;
 
 @SpringView(name = BestellungView.VIEW_NAME)
 @UIScope
@@ -67,7 +69,9 @@ public class BestellungView extends VerticalLayout implements View {
 	private void buildLayout() {
 		HorizontalLayout toolbar = new HorizontalLayout(filter, addNewBtn);
 		toolbar.setSpacing(true);
-		grid.setColumns("kunde.name", "erledigt");
+		grid.setColumns("kunde.name");
+		grid.addColumn("erledigt", Boolean.class).setRenderer(new HtmlRenderer(), new IconStringToBooleanConverter());
+
 		grid.getColumn("kunde.name").setHeaderCaption("Kunde");
 		grid.setSizeFull();
 
