@@ -67,23 +67,23 @@ public class BestellungView extends VerticalLayout implements View {
 	}
 
 	private void buildLayout() {
-		HorizontalLayout toolbar = new HorizontalLayout(filter, addNewBtn);
-		toolbar.setSpacing(true);
+		HorizontalLayout gridToolbar = new HorizontalLayout(filter, addNewBtn);
+		gridToolbar.setSpacing(true);
 		grid.setColumns("kunde.name");
 		grid.addColumn("erledigt", Boolean.class).setRenderer(new HtmlRenderer(), new IconStringToBooleanConverter());
-
 		grid.getColumn("kunde.name").setHeaderCaption("Kunde");
 		grid.setSizeFull();
 
-		HorizontalLayout main = new HorizontalLayout(grid, editor);
+		VerticalLayout gridLayout = new VerticalLayout(gridToolbar, grid);
+		gridLayout.setSpacing(true);
+		HorizontalLayout main = new HorizontalLayout(gridLayout, editor);
 		main.setSpacing(true);
 		main.setSizeFull();
 
-		main.setExpandRatio(grid, 2);
-		main.setExpandRatio(editor, 1);
+		main.setExpandRatio(gridLayout, 1);
+		main.setExpandRatio(editor, 2);
 
 		// build layout
-		addComponent(toolbar);
 		addComponent(main);
 		setSpacing(true);
 		setMargin(true);

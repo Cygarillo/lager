@@ -19,6 +19,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -48,6 +49,7 @@ public class BestellungEditor extends VerticalLayout {
 	private ComboBox kunde = new ComboBox("Wähle Kunde");
 
 	/* Action buttons */
+	private Button add = new Button("Hinzufügen", FontAwesome.PLUS);
 	private Button save = new Button("Speichern", FontAwesome.SAVE);
 	private Button cancel = new Button("Abbrechen");
 	private CssLayout actions = new CssLayout(save, cancel);
@@ -57,6 +59,8 @@ public class BestellungEditor extends VerticalLayout {
 	public void init() {
 		// Configure and style components
 		setSpacing(true);
+		HorizontalLayout toolbar = new HorizontalLayout(add);
+		toolbar.setSpacing(true);
 		actions.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
 		save.setStyleName(ValoTheme.BUTTON_PRIMARY);
 		save.setClickShortcut(ShortcutAction.KeyCode.ENTER);
@@ -70,14 +74,13 @@ public class BestellungEditor extends VerticalLayout {
 		kunde.setItemCaptionPropertyId("name");
 		kunde.setNullSelectionAllowed(false);
 		kunde.setFilteringMode(FilteringMode.CONTAINS);
-		kunde.setSizeFull();
 		loadKunden();
 
 		// bestellposition
 		bestellpositionGrid.setColumns("produkt.name", "anzahl");
 		bestellpositionGrid.setSizeFull();
 
-		addComponents(kunde, bestellpositionGrid, actions);
+		addComponents(toolbar, kunde, bestellpositionGrid, actions);
 		forEach(e -> {
 			e.setSizeFull();
 		});
@@ -127,8 +130,6 @@ public class BestellungEditor extends VerticalLayout {
 
 		// A hack to ensure the whole form is visible
 		save.focus();
-		// Select all text in firstName field automatically
-//		name.selectAll();
 	}
 
 	@Subscribe
