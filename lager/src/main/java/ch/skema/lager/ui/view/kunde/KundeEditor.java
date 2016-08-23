@@ -83,4 +83,7 @@ public class KundeEditor extends VerticalLayout {
 		name.selectAll();
 	}
 
+	public Kunde getCustomer() {
+		return customer;
+	}
 }

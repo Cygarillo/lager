@@ -81,4 +81,8 @@ public class KategorieEditor extends VerticalLayout {
 		name.selectAll();
 	}
 
+	public Kategorie getKategorie() {
+		return kategorie;
+	}
+
 }

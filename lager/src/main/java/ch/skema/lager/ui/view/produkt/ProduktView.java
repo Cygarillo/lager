@@ -106,14 +106,10 @@ public class ProduktView extends VerticalLayout implements View {
 	}
 
 	private void listData(String text) {
-		boolean restoreSelection = false;
-		if (editor.isVisible() && editor.getProduct() != null) {
-			restoreSelection = true;
-		}
 		if (StringUtils.isEmpty(text)) {
 			BeanItemContainer<Produkt> container = createBeanItemContainer(repo.findAll());
 			grid.setContainerDataSource(container);
-			if (restoreSelection) {
+			if (shouldRestoreSelection()) {
 				grid.select(container.getItemIds().stream().filter(i -> i.getId().equals(editor.getProduct().getId())).findFirst().get());
 			}
 		} else {
@@ -121,6 +117,10 @@ public class ProduktView extends VerticalLayout implements View {
 			grid.setContainerDataSource(container);
 		}
 
+	}
+
+	private boolean shouldRestoreSelection() {
+		return editor.isVisible() && editor.getProduct() != null;
 	}
 
 	@Subscribe

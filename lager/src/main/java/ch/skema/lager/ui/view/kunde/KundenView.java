@@ -103,10 +103,19 @@ public class KundenView extends VerticalLayout implements View {
 
 	private void listCustomers(String text) {
 		if (StringUtils.isEmpty(text)) {
-			grid.setContainerDataSource(new BeanItemContainer<>(Kunde.class, repo.findAll()));
+			BeanItemContainer<Kunde> container = new BeanItemContainer<>(Kunde.class, repo.findAll());
+			grid.setContainerDataSource(container);
+			if (shouldRestoreSelection()) {
+				grid.select(container.getItemIds().stream().filter(c -> c.getId().equals(editor.getCustomer().getId())).findFirst().get());
+			}
+
 		} else {
 			grid.setContainerDataSource(new BeanItemContainer<>(Kunde.class, repo.findByNameStartsWithIgnoreCase(text)));
 		}
+	}
+
+	private boolean shouldRestoreSelection() {
+		return editor.isVisible() && editor.getCustomer() != null;
 	}
 
 	@Subscribe

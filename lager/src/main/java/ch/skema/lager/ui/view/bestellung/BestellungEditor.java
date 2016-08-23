@@ -136,4 +136,8 @@ public class BestellungEditor extends VerticalLayout {
 		loadKunden();
 	}
 
+	public Bestellung getBestellung() {
+		return bestellung;
+	}
+
 }

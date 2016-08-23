@@ -106,7 +106,11 @@ public class BestellungView extends VerticalLayout implements View {
 	}
 
 	private void listData() {
-		grid.setContainerDataSource(createBeanItemContainer(repo.findAll()));
+		BeanItemContainer<Bestellung> container = createBeanItemContainer(repo.findAll());
+		grid.setContainerDataSource(container);
+		if (shouldRestoreSelection()) {
+			grid.select(container.getItemIds().stream().filter(i -> editor.getBestellung().getId().equals(i.getId())).findFirst().get());
+		}
 	}
 
 	private BeanItemContainer<Bestellung> createBeanItemContainer(List<Bestellung> findAll) {
@@ -121,4 +125,7 @@ public class BestellungView extends VerticalLayout implements View {
 		listData();
 	}
 
+	private boolean shouldRestoreSelection() {
+		return editor.isVisible() && editor.getBestellung() != null;
+	}
 }

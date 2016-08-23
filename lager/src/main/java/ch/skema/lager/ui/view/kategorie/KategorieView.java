@@ -108,7 +108,12 @@ public class KategorieView extends VerticalLayout implements View {
 
 	private void listEntity(String text) {
 		if (StringUtils.isEmpty(text)) {
-			grid.setContainerDataSource(new BeanItemContainer<>(Kategorie.class, repo.findAll()));
+			BeanItemContainer<Kategorie> container = new BeanItemContainer<>(Kategorie.class, repo.findAll());
+			grid.setContainerDataSource(container);
+			if (shouldRestoreSelection()) {
+				grid.select(container.getItemIds().stream().filter(i -> editor.getKategorie().getId().equals(i.getId())).findFirst().get());
+			}
+
 		} else {
 			grid.setContainerDataSource(new BeanItemContainer<>(Kategorie.class, repo.findByNameStartsWithIgnoreCase(text)));
 		}
@@ -120,4 +125,7 @@ public class KategorieView extends VerticalLayout implements View {
 		listEntity(filter.getValue());
 	}
 
+	private boolean shouldRestoreSelection() {
+		return editor.isVisible() && editor.getKategorie() != null;
+	}
 }
