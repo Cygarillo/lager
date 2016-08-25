@@ -40,7 +40,7 @@ public class BestellungView extends VerticalLayout implements View {
 	@Autowired
 	private BestellungRepository repo;
 	@Autowired
-	private BestellungEditor editor;
+	private BestellungDetailView editor;
 	private TextField filter;
 	private Button addNewBtn;
 
@@ -114,6 +114,8 @@ public class BestellungView extends VerticalLayout implements View {
 		grid.setContainerDataSource(container);
 		if (shouldRestoreSelection()) {
 			grid.select(container.getItemIds().stream().filter(i -> editor.getBestellung().getId().equals(i.getId())).findFirst().get());
+		} else {
+			grid.select(container.firstItemId());
 		}
 	}
 

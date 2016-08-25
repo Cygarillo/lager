@@ -10,23 +10,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.event.ShortcutAction;
-import com.vaadin.server.FontAwesome;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Grid;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ValoTheme;
 
 import ch.skema.lager.domain.BestellPosition;
 import ch.skema.lager.domain.Bestellung;
 import ch.skema.lager.domain.Kunde;
-import ch.skema.lager.event.LagerEvent.BestellungEvent;
 import ch.skema.lager.event.LagerEvent.KundeEvent;
 import ch.skema.lager.event.LagerEventBus;
 import ch.skema.lager.repository.BestellungRepository;
@@ -34,7 +27,7 @@ import ch.skema.lager.repository.KundeRepository;
 
 @SpringComponent
 @UIScope
-public class BestellungEditor extends VerticalLayout {
+public class BestellungDetailView extends VerticalLayout {
 	private static final long serialVersionUID = 1L;
 
 	@Autowired
@@ -46,30 +39,16 @@ public class BestellungEditor extends VerticalLayout {
 	 * The currently edited entity
 	 */
 	private Bestellung bestellung;
-	private ComboBox kunde = new ComboBox("Wähle Kunde");
+	private ComboBox kunde = new ComboBox("Kunde");
 
 	/* Action buttons */
-	private Button add = new Button("Hinzufügen", FontAwesome.PLUS);
-	private Button save = new Button("Speichern", FontAwesome.SAVE);
-	private Button cancel = new Button("Abbrechen");
-	private CssLayout actions = new CssLayout(save, cancel);
 	private Grid bestellpositionGrid = new Grid();
 
 	@PostConstruct
 	public void init() {
 		// Configure and style components
 		setSpacing(true);
-		HorizontalLayout toolbar = new HorizontalLayout(add);
-		toolbar.setSpacing(true);
-		actions.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
-		save.setStyleName(ValoTheme.BUTTON_PRIMARY);
-		save.setClickShortcut(ShortcutAction.KeyCode.ENTER);
-		save.addClickListener(e -> {
-			if (isValid()) {
-				bestellRepo.save(bestellung);
-				LagerEventBus.post(new BestellungEvent());
-			}
-		});
+
 		// kunde
 		kunde.setItemCaptionPropertyId("name");
 		kunde.setNullSelectionAllowed(false);
@@ -80,10 +59,11 @@ public class BestellungEditor extends VerticalLayout {
 		bestellpositionGrid.setColumns("produkt.name", "anzahl");
 		bestellpositionGrid.setSizeFull();
 
-		addComponents(toolbar, kunde, bestellpositionGrid, actions);
+		addComponents(kunde, bestellpositionGrid);
 		forEach(e -> {
 			e.setSizeFull();
 		});
+
 		setVisible(false);
 		LagerEventBus.register(this);
 	}
@@ -93,10 +73,6 @@ public class BestellungEditor extends VerticalLayout {
 		BeanItemContainer<BestellPosition> container = new BeanItemContainer<>(BestellPosition.class, bestellPosition);
 		container.addNestedContainerProperty("produkt.name");
 		bestellpositionGrid.setContainerDataSource(container);
-	}
-
-	private boolean isValid() {
-		return kunde.isValid();
 	}
 
 	private void loadKunden() {
@@ -111,16 +87,9 @@ public class BestellungEditor extends VerticalLayout {
 	}
 
 	public final void edit(Bestellung bestellung) {
-		final boolean persisted = bestellung.getId() != null;
-		if (persisted) {
-			// Find fresh entity for editing
-			this.bestellung = bestellRepo.findOne(bestellung.getId());
-		} else {
-			this.bestellung = bestellung;
-			this.bestellung.setKunde((Kunde) kunde.getConvertedValue());
-		}
+		// Find fresh entity for editing
+		this.bestellung = bestellRepo.findOne(bestellung.getId());
 		loadBestellposition();
-		cancel.setVisible(persisted);
 
 		// Bind customer properties to similarly named fields
 		// Could also use annotation or "manual binding" or programmatically
@@ -128,8 +97,10 @@ public class BestellungEditor extends VerticalLayout {
 		BeanFieldGroup.bindFieldsUnbuffered(this.bestellung, this);
 		setVisible(true);
 
+		kunde.setReadOnly(true);
+
 		// A hack to ensure the whole form is visible
-		save.focus();
+		bestellpositionGrid.focus();
 	}
 
 	@Subscribe
