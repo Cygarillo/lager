@@ -103,7 +103,7 @@ public class BestellungView extends VerticalLayout implements View {
 		});
 
 		// Instantiate and edit new Customer the new button is clicked
-		addNewBtn.addClickListener(e -> editor.edit(new Bestellung(new Date())));
+		addNewBtn.addClickListener(e -> BestellungEditWindow.open(new Bestellung(new Date())));
 
 		// Initialize listing
 		listData();
