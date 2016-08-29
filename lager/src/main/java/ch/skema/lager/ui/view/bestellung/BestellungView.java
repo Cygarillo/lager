@@ -15,9 +15,9 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.renderers.HtmlRenderer;
 
@@ -41,7 +41,7 @@ public class BestellungView extends VerticalLayout implements View {
 	private BestellungRepository repo;
 	@Autowired
 	private BestellungDetailView editor;
-	private TextField filter;
+	private CheckBox filter;
 	private Button addNewBtn;
 
 	private Grid grid;
@@ -50,7 +50,7 @@ public class BestellungView extends VerticalLayout implements View {
 	void init() {
 		this.grid = new Grid();
 		this.addNewBtn = new Button("Neue Bestellung", FontAwesome.PLUS);
-		this.filter = new TextField();
+		this.filter = new CheckBox("erledigt", false);
 		buildLayout();
 		LagerEventBus.register(this);
 	}
@@ -88,10 +88,8 @@ public class BestellungView extends VerticalLayout implements View {
 		setSpacing(true);
 		setMargin(true);
 
-		filter.setInputPrompt("Nach Name filtern:");
-
 		// Replace listing with filtered content when user changes filter
-		filter.addTextChangeListener(e -> listData());
+		filter.addValueChangeListener(e -> listData());
 
 		// Connect selected Customer to editor or hide if none is selected
 		grid.addSelectionListener(e -> {
@@ -110,7 +108,7 @@ public class BestellungView extends VerticalLayout implements View {
 	}
 
 	private void listData() {
-		BeanItemContainer<Bestellung> container = createBeanItemContainer(repo.findAll());
+		BeanItemContainer<Bestellung> container = createBeanItemContainer(repo.findByErledigt(filter.getValue()));
 		grid.setContainerDataSource(container);
 		if (shouldRestoreSelection()) {
 			grid.select(container.getItemIds().stream().filter(i -> editor.getBestellung().getId().equals(i.getId())).findFirst().get());
