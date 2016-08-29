@@ -14,6 +14,7 @@ import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.spring.annotation.UIScope;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Grid;
@@ -40,9 +41,10 @@ public class BestellungView extends VerticalLayout implements View {
 	@Autowired
 	private BestellungRepository repo;
 	@Autowired
-	private BestellungDetailView editor;
+	private BestellungDetailView detailView;
 	private CheckBox filter;
 	private Button addNewBtn;
+	private Button editBtn;
 
 	private Grid grid;
 
@@ -50,6 +52,7 @@ public class BestellungView extends VerticalLayout implements View {
 	void init() {
 		this.grid = new Grid();
 		this.addNewBtn = new Button("Neue Bestellung", FontAwesome.PLUS);
+		this.editBtn = new Button("bearbeiten", FontAwesome.EDIT);
 		this.filter = new CheckBox("erledigt", false);
 		buildLayout();
 		LagerEventBus.register(this);
@@ -67,23 +70,23 @@ public class BestellungView extends VerticalLayout implements View {
 	}
 
 	private void buildLayout() {
-		HorizontalLayout gridToolbar = new HorizontalLayout(filter, addNewBtn);
+		HorizontalLayout gridToolbar = new HorizontalLayout(filter, addNewBtn, editBtn);
 		gridToolbar.setSpacing(true);
+		gridToolbar.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
 		grid.setColumns("kunde.name");
 		grid.addColumn("erledigt", Boolean.class).setRenderer(new HtmlRenderer(), new IconStringToBooleanConverter());
 		grid.getColumn("kunde.name").setHeaderCaption("Kunde");
 		grid.setSizeFull();
 
-		VerticalLayout gridLayout = new VerticalLayout(gridToolbar, grid);
-		gridLayout.setSpacing(true);
-		HorizontalLayout main = new HorizontalLayout(gridLayout, editor);
+		HorizontalLayout main = new HorizontalLayout(grid, detailView);
 		main.setSpacing(true);
 		main.setSizeFull();
 
-		main.setExpandRatio(gridLayout, 1);
-		main.setExpandRatio(editor, 2);
+		main.setExpandRatio(grid, 1);
+		main.setExpandRatio(detailView, 2);
 
 		// build layout
+		addComponent(gridToolbar);
 		addComponent(main);
 		setSpacing(true);
 		setMargin(true);
@@ -94,14 +97,15 @@ public class BestellungView extends VerticalLayout implements View {
 		// Connect selected Customer to editor or hide if none is selected
 		grid.addSelectionListener(e -> {
 			if (e.getSelected().isEmpty()) {
-				editor.setVisible(false);
+				detailView.setVisible(false);
 			} else {
-				editor.edit((Bestellung) grid.getSelectedRow());
+				detailView.edit((Bestellung) grid.getSelectedRow());
 			}
 		});
 
 		// Instantiate and edit new Customer the new button is clicked
 		addNewBtn.addClickListener(e -> BestellungEditWindow.open(new Bestellung(new Date())));
+		editBtn.addClickListener(e -> BestellungEditWindow.open(detailView.getBestellung()));
 
 		// Initialize listing
 		listData();
@@ -111,7 +115,7 @@ public class BestellungView extends VerticalLayout implements View {
 		BeanItemContainer<Bestellung> container = createBeanItemContainer(repo.findByErledigt(filter.getValue()));
 		grid.setContainerDataSource(container);
 		if (shouldRestoreSelection()) {
-			grid.select(container.getItemIds().stream().filter(i -> editor.getBestellung().getId().equals(i.getId())).findFirst().get());
+			grid.select(container.getItemIds().stream().filter(i -> detailView.getBestellung().getId().equals(i.getId())).findFirst().get());
 		} else {
 			grid.select(container.firstItemId());
 		}
@@ -125,11 +129,11 @@ public class BestellungView extends VerticalLayout implements View {
 
 	@Subscribe
 	public void processBestllungEvent(final BestellungEvent event) {
-		editor.setVisible(false);
+		detailView.setVisible(false);
 		listData();
 	}
 
 	private boolean shouldRestoreSelection() {
-		return editor.isVisible() && editor.getBestellung() != null;
+		return detailView.isVisible() && detailView.getBestellung() != null;
 	}
 }
