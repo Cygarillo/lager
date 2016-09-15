@@ -5,7 +5,6 @@ import com.vaadin.data.fieldgroup.PropertyId;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.server.UserError;
 import com.vaadin.shared.Position;
 import com.vaadin.shared.ui.MarginInfo;
@@ -13,11 +12,11 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.OptionGroup;
@@ -64,6 +63,13 @@ public class BestellungEditWindow extends Window {
 	@PropertyId("bio")
 	private TextArea bioField;
 
+	@PropertyId("kunde")
+	private ComboBox kunde;
+	@PropertyId("erledigt")
+	private CheckBox erledigt;
+
+	private Bestellung bestellung;
+
 	private BestellungEditWindow(final Bestellung bestellung) {
 		setId(ID);
 
@@ -72,6 +78,7 @@ public class BestellungEditWindow extends Window {
 		setClosable(false);
 		setHeight(90.0f, Unit.PERCENTAGE);
 		setWidth(70.0f, Unit.PERCENTAGE);
+		this.bestellung = bestellung;
 
 		VerticalLayout content = new VerticalLayout();
 		content.setSizeFull();
@@ -85,8 +92,8 @@ public class BestellungEditWindow extends Window {
 		content.addComponent(buildFooter());
 
 		fieldGroup = new BeanFieldGroup<>(Bestellung.class);
-//		fieldGroup.bindMemberFields(this);
-//		fieldGroup.setItemDataSource(bestellung);
+		fieldGroup.bindMemberFields(this);
+		fieldGroup.setItemDataSource(bestellung);
 	}
 
 	private Component buildMainComponent() {
@@ -94,24 +101,6 @@ public class BestellungEditWindow extends Window {
 		root.setWidth(100.0f, Unit.PERCENTAGE);
 		root.setSpacing(true);
 		root.setMargin(true);
-
-		VerticalLayout pic = new VerticalLayout();
-		pic.setSizeUndefined();
-		pic.setSpacing(true);
-		Image profilePic = new Image(null, new ThemeResource("img/profile-pic-300px.jpg"));
-		profilePic.setWidth(100.0f, Unit.PIXELS);
-		pic.addComponent(profilePic);
-
-		Button upload = new Button("Change…", new ClickListener() {
-			@Override
-			public void buttonClick(ClickEvent event) {
-				Notification.show("Not implemented in this demo");
-			}
-		});
-		upload.addStyleName(ValoTheme.BUTTON_TINY);
-		pic.addComponent(upload);
-
-		root.addComponent(pic);
 
 		FormLayout details = new FormLayout();
 		details.addStyleName(ValoTheme.FORMLAYOUT_LIGHT);
@@ -161,28 +150,19 @@ public class BestellungEditWindow extends Window {
 		phoneField.setNullRepresentation("");
 		details.addComponent(phoneField);
 
-//		newsletterField = new OptionalSelect<Integer>();
-//		newsletterField.addOption(0, "Daily");
-//		newsletterField.addOption(1, "Weekly");
-//		newsletterField.addOption(2, "Monthly");
-//		details.addComponent(newsletterField);
-
-		section = new Label("Additional Info");
+		section = new Label(bestellung.getId() == null ? "Bestellung erfassen" : "Bestellung editieren");
 		section.addStyleName(ValoTheme.LABEL_H4);
 		section.addStyleName(ValoTheme.LABEL_COLORED);
 		details.addComponent(section);
 
-		websiteField = new TextField("Website");
-		websiteField.setInputPrompt("http://");
-		websiteField.setWidth("100%");
-		websiteField.setNullRepresentation("");
-		details.addComponent(websiteField);
+		kunde = new ComboBox("Kunde");
+		kunde.setInvalidAllowed(false);
+		kunde.setNewItemsAllowed(false);
+		kunde.setNullSelectionAllowed(false);
+		details.addComponent(kunde);
 
-		bioField = new TextArea("Bio");
-		bioField.setWidth("100%");
-		bioField.setRows(4);
-		bioField.setNullRepresentation("");
-		details.addComponent(bioField);
+		erledigt = new CheckBox("Erledigt");
+		details.addComponent(erledigt);
 
 		return root;
 	}
