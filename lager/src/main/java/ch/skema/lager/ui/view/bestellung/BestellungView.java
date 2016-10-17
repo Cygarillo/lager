@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.event.ItemClickEvent;
+import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FontAwesome;
@@ -54,6 +56,16 @@ public class BestellungView extends VerticalLayout implements View {
 	@PostConstruct
 	void init() {
 		this.grid = new Grid();
+		this.grid.addItemClickListener(new ItemClickListener() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void itemClick(ItemClickEvent event) {
+				if (event.isDoubleClick()) {
+					editWindow.open((Bestellung) event.getItemId());
+				}
+			}
+		});
 		this.addNewBtn = new Button("Neue Bestellung", FontAwesome.PLUS);
 		this.editBtn = new Button("bearbeiten", FontAwesome.EDIT);
 		this.filter = new CheckBox("erledigt", false);
