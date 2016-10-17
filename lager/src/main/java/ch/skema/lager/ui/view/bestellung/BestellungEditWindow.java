@@ -1,13 +1,20 @@
 package ch.skema.lager.ui.view.bestellung;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.PropertyId;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.server.UserError;
 import com.vaadin.shared.Position;
 import com.vaadin.shared.ui.MarginInfo;
+import com.vaadin.spring.annotation.SpringComponent;
+import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -19,6 +26,7 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
@@ -28,13 +36,20 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
 import ch.skema.lager.domain.Bestellung;
+import ch.skema.lager.domain.Kunde;
+import ch.skema.lager.event.LagerEvent;
+import ch.skema.lager.event.LagerEventBus;
+import ch.skema.lager.repository.BestellungRepository;
+import ch.skema.lager.repository.KundeRepository;
 
-@SuppressWarnings("serial")
+@UIScope
+@SpringComponent
 public class BestellungEditWindow extends Window {
+	private static final long serialVersionUID = 1L;
 
 	public static final String ID = "BestellungEditWindow";
 
-	private final BeanFieldGroup<Bestellung> fieldGroup;
+	private BeanFieldGroup<Bestellung> fieldGroup;
 	/*
 	 * Fields for editing the User object are defined here as class members.
 	 * They are later bound to a FieldGroup by calling
@@ -70,7 +85,12 @@ public class BestellungEditWindow extends Window {
 
 	private Bestellung bestellung;
 
-	private BestellungEditWindow(final Bestellung bestellung) {
+	@Autowired
+	private KundeRepository kundeRepo;
+	@Autowired
+	private BestellungRepository bestellRepo;
+
+	public BestellungEditWindow() {
 		setId(ID);
 
 		setModal(true);
@@ -78,22 +98,7 @@ public class BestellungEditWindow extends Window {
 		setClosable(false);
 		setHeight(90.0f, Unit.PERCENTAGE);
 		setWidth(70.0f, Unit.PERCENTAGE);
-		this.bestellung = bestellung;
 
-		VerticalLayout content = new VerticalLayout();
-		content.setSizeFull();
-		content.setMargin(new MarginInfo(true, false, false, false));
-		setContent(content);
-
-		Component main = buildMainComponent();
-		content.addComponent(main);
-		content.setExpandRatio(main, 1f);
-
-		content.addComponent(buildFooter());
-
-		fieldGroup = new BeanFieldGroup<>(Bestellung.class);
-		fieldGroup.bindMemberFields(this);
-		fieldGroup.setItemDataSource(bestellung);
 	}
 
 	private Component buildMainComponent() {
@@ -159,7 +164,12 @@ public class BestellungEditWindow extends Window {
 		kunde.setInvalidAllowed(false);
 		kunde.setNewItemsAllowed(false);
 		kunde.setNullSelectionAllowed(false);
+		kunde.setItemCaptionPropertyId("name");
 		details.addComponent(kunde);
+
+		List<Kunde> kunden = kundeRepo.findAll();
+		BeanItemContainer<Kunde> container = new BeanItemContainer<>(Kunde.class, kunden);
+		kunde.setContainerDataSource(container);
 
 		erledigt = new CheckBox("Erledigt");
 		details.addComponent(erledigt);
@@ -176,12 +186,15 @@ public class BestellungEditWindow extends Window {
 		save.setClickShortcut(ShortcutAction.KeyCode.ENTER);
 		save.addStyleName(ValoTheme.BUTTON_PRIMARY);
 		save.addClickListener(new ClickListener() {
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void buttonClick(ClickEvent event) {
 				try {
-//					fieldGroup.commit();
-					// Updated user should also be persisted to database. But
-					// not in this demo.
+					// TODO only if valid
+					fieldGroup.commit();
+					bestellRepo.save(fieldGroup.getItemDataSource().getBean());
+					LagerEventBus.post(new LagerEvent.BestellungEvent());
 
 					Notification success = new Notification("Bestellung gespeichert");
 					success.setDelayMsec(2000);
@@ -189,18 +202,15 @@ public class BestellungEditWindow extends Window {
 					success.setPosition(Position.BOTTOM_CENTER);
 					success.show(Page.getCurrent());
 
-//					DashboardEventBus.post(new ProfileUpdatedEvent());
 					close();
-//				} catch (CommitException e) {
 				} catch (Exception e) {
-//					Notification.show("Error while updating profile", Type.ERROR_MESSAGE);
+					Notification.show("Error while updating profile", Type.ERROR_MESSAGE);
 				}
 
 			}
 		});
 		save.focus();
 		Button cancel = new Button("Abbrechen");
-		cancel.setClickShortcut(ShortcutAction.KeyCode.ESCAPE);
 		cancel.addClickListener(e -> close());
 		footer.addComponents(save, cancel);
 
@@ -208,9 +218,23 @@ public class BestellungEditWindow extends Window {
 		return footer;
 	}
 
-	public static void open(final Bestellung bestellung) {
-		Window w = new BestellungEditWindow(bestellung);
-		UI.getCurrent().addWindow(w);
-		w.focus();
+	public void open(final Bestellung bestellung) {
+		UI.getCurrent().addWindow(this);
+		this.bestellung = bestellung;
+		VerticalLayout content = new VerticalLayout();
+		content.setSizeFull();
+		content.setMargin(new MarginInfo(true, false, false, false));
+		setContent(content);
+
+		Component main = buildMainComponent();
+		content.addComponent(main);
+		content.setExpandRatio(main, 1f);
+
+		content.addComponent(buildFooter());
+
+		fieldGroup = new BeanFieldGroup<>(Bestellung.class);
+		fieldGroup.bindMemberFields(this);
+		fieldGroup.setItemDataSource(bestellung);
+		this.focus();
 	}
 }

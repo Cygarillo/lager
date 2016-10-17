@@ -42,6 +42,9 @@ public class BestellungView extends VerticalLayout implements View {
 	private BestellungRepository repo;
 	@Autowired
 	private BestellungDetailView detailView;
+	@Autowired
+	private BestellungEditWindow editWindow;
+
 	private CheckBox filter;
 	private Button addNewBtn;
 	private Button editBtn;
@@ -104,8 +107,8 @@ public class BestellungView extends VerticalLayout implements View {
 		});
 
 		// Instantiate and edit new Customer the new button is clicked
-		addNewBtn.addClickListener(e -> BestellungEditWindow.open(new Bestellung(new Date())));
-		editBtn.addClickListener(e -> BestellungEditWindow.open(detailView.getBestellung()));
+		addNewBtn.addClickListener(e -> editWindow.open(new Bestellung(new Date())));
+		editBtn.addClickListener(e -> editWindow.open(detailView.getBestellung()));
 
 		// Initialize listing
 		listData();
