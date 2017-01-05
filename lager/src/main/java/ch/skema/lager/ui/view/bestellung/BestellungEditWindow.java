@@ -1,5 +1,6 @@
 package ch.skema.lager.ui.view.bestellung;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
@@ -35,12 +37,15 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
+import ch.skema.lager.domain.BestellPosition;
 import ch.skema.lager.domain.Bestellung;
 import ch.skema.lager.domain.Kunde;
+import ch.skema.lager.domain.Produkt;
 import ch.skema.lager.event.LagerEvent;
 import ch.skema.lager.event.LagerEventBus;
 import ch.skema.lager.repository.BestellungRepository;
 import ch.skema.lager.repository.KundeRepository;
+import ch.skema.lager.repository.ProduktRepository;
 
 @UIScope
 @SpringComponent
@@ -89,6 +94,8 @@ public class BestellungEditWindow extends Window {
 	private KundeRepository kundeRepo;
 	@Autowired
 	private BestellungRepository bestellRepo;
+	@Autowired
+	private ProduktRepository produktRepo;
 
 	public BestellungEditWindow() {
 		setId(ID);
@@ -111,27 +118,6 @@ public class BestellungEditWindow extends Window {
 		details.addStyleName(ValoTheme.FORMLAYOUT_LIGHT);
 		root.addComponent(details);
 		root.setExpandRatio(details, 1);
-
-		firstNameField = new TextField("First Name");
-		details.addComponent(firstNameField);
-		lastNameField = new TextField("Last Name");
-		details.addComponent(lastNameField);
-
-		titleField = new ComboBox("Title");
-		titleField.setInputPrompt("Please specify");
-		titleField.addItem("Mr.");
-		titleField.addItem("Mrs.");
-		titleField.addItem("Ms.");
-		titleField.setNewItemsAllowed(true);
-		details.addComponent(titleField);
-
-		sexField = new OptionGroup("Sex");
-		sexField.addItem(Boolean.FALSE);
-		sexField.setItemCaption(Boolean.FALSE, "Female");
-		sexField.addItem(Boolean.TRUE);
-		sexField.setItemCaption(Boolean.TRUE, "Male");
-		sexField.addStyleName("horizontal");
-		details.addComponent(sexField);
 
 		Label section = new Label("Contact Info");
 		section.addStyleName(ValoTheme.LABEL_H4);
@@ -173,6 +159,27 @@ public class BestellungEditWindow extends Window {
 
 		erledigt = new CheckBox("Erledigt");
 		details.addComponent(erledigt);
+
+		Grid grid = new Grid();
+		grid.setColumns("produkt.name");
+		grid.setColumns("anzahl");
+		details.addComponent(grid);
+
+		BeanItemContainer<BestellPosition> con = new BeanItemContainer<>(BestellPosition.class, bestellung.getBestellPosition());
+		con.addNestedContainerProperty("produkt.name");
+		grid.setContainerDataSource(con);
+
+		Button addbestellPosButton = new Button("Neue Bestellung", FontAwesome.PLUS);
+		addbestellPosButton.addClickListener(e -> {
+			BestellPosition pos = new BestellPosition();
+			pos.setAnzahl(42L);
+			pos.setRabatt(BigDecimal.TEN);
+			pos.setStueckpreis(new BigDecimal(18));
+			Produkt produkt = produktRepo.findAll().get(0);
+			pos.setProdukt(produkt);
+			bestellung.getBestellPosition().add(pos);
+		});
+		details.addComponent(addbestellPosButton);
 
 		return root;
 	}
